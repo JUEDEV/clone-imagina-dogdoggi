@@ -28,7 +28,7 @@ Regla: **solo es isla lo que Astro no puede resolver sin JS**, y la isla aporta 
 
 | Isla | Usada en | Directiva | Por qué |
 |---|---|---|---|
-| `Carousel.tsx` | `home/HeroSlider`, `home/Testimonios` | `client:visible` | Embla: arrastre, loop, autoplay con botón de pausa (WCAG 2.2.2), flechas, puntos y contador |
+| `Carousel.tsx` | `home/HeroSlider`, `home/Testimonios` | `client:visible` | Embla: arrastre, loop, autoplay (el hero se pausa al pasar el mouse; `pauseButton` opcional), flechas, puntos y contador |
 | `SearchBox.tsx` | `Header` | `client:visible` | Consulta `/api/search` y pinta resultados; en móvil abre el buscador flotante |
 | `MegaMenu.tsx` | `Header` | `client:media="(min-width: 768px)"` | Radix NavigationMenu: abre con hover y teclado, cierra con Escape |
 | `MobileMenu.tsx` | `Header` | `client:media="(max-width: 767px)"` | Radix Sheet (dialog, focus trap) con submenú de tienda |

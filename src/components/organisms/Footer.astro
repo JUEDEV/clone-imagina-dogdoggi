@@ -11,11 +11,11 @@ const year = new Date().getFullYear()
 <footer id="contacto" class="bg-navy pt-[65px] text-[#f1f8fb]">
   <div class="shell grid grid-cols-2 gap-x-[25px] gap-y-[35px] pb-[55px] md:grid-cols-[1.7fr_repeat(3,1fr)] md:gap-[30px] desk:gap-[60px]">
     <div class="col-span-full md:col-span-1">
-      <Logo plate class="mb-5 h-20 w-[175px]" />
+      <Logo class="mb-5 h-20 w-[175px]" />
       <p class="max-w-[350px] text-sm text-[#c7d4e6]">
         Herramientas, equipos y cosmética para quienes hacen de cada peluquería un lugar extraordinario.
       </p>
-      <div class="flex gap-2">
+      <div class="mt-6 flex gap-2">
         {SOCIAL.map((social) => (
           <a
             href={social.href}

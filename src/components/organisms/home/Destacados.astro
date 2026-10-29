@@ -6,11 +6,13 @@ import SectionHeading from '@/components/molecules/SectionHeading.astro'
 import { PRODUCTS, type ProductKind } from '@/data/products'
 
 // Filtro sin JS: radios + :has(). La fila es un scroll-snap nativo (no hace
-// falta Embla para deslizar), así que la sección no envía JavaScript.
+// falta Embla para deslizar); las flechas laterales son un <script> corto que
+// desplaza la fila una tarjeta y se desactivan en los extremos.
 const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
   { id: 'filtro-todos', label: 'Más vendidos' },
   { id: 'filtro-herramientas', label: 'Herramientas', kind: 'herramientas' },
   { id: 'filtro-cosmetica', label: 'Cosmética', kind: 'cosmetica' },
+  { id: 'filtro-equipamiento', label: 'Equipamiento', kind: 'equipamiento' },
 ]
 ---
 
@@ -36,10 +38,29 @@ const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
         ))}
       </fieldset>
 
-      <div
-        class="grid auto-cols-[76%] grid-flow-col gap-3 overflow-x-auto px-0.5 pt-1 pb-5 [scrollbar-width:thin] snap-x snap-mandatory md:auto-cols-[calc((100%-48px)/4)] md:gap-4 group-has-[#filtro-cosmetica:checked]/filters:[&_[data-kind=herramientas]]:hidden group-has-[#filtro-herramientas:checked]/filters:[&_[data-kind=cosmetica]]:hidden"
-      >
-        {PRODUCTS.map((product) => <ProductCard product={product} class="snap-start" />)}
+      <div class="relative">
+        <div
+          data-featured-track
+          class="scrollbar-none grid auto-cols-[76%] grid-flow-col gap-3 overflow-x-auto px-0.5 pt-1 pb-5 snap-x snap-mandatory md:auto-cols-[calc((100%-48px)/4)] md:gap-4 group-has-[#filtro-herramientas:checked]/filters:[&_[data-kind]:not([data-kind=herramientas])]:hidden group-has-[#filtro-cosmetica:checked]/filters:[&_[data-kind]:not([data-kind=cosmetica])]:hidden group-has-[#filtro-equipamiento:checked]/filters:[&_[data-kind]:not([data-kind=equipamiento])]:hidden"
+        >
+          {PRODUCTS.map((product) => <ProductCard product={product} class="snap-start" />)}
+        </div>
+        {([
+          { dir: -1, icon: 'chevron-left', label: 'Productos anteriores', side: '-left-3 desk:-left-6' },
+          { dir: 1, icon: 'chevron-right', label: 'Productos siguientes', side: '-right-3 desk:-right-6' },
+        ] as const).map((arrow) => (
+          <button
+            type="button"
+            data-featured-arrow={arrow.dir}
+            aria-label={arrow.label}
+            class:list={[
+              'absolute top-[calc(50%-10px)] z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full bg-white text-navy shadow-[0_8px_24px_rgba(5,28,72,0.18)] transition-[background,color,opacity] duration-200 hover:bg-navy hover:text-white active:scale-95 disabled:pointer-events-none disabled:opacity-0 md:inline-grid',
+              arrow.side,
+            ]}
+          >
+            <Icon name={arrow.icon} class="size-6" />
+          </button>
+        ))}
       </div>
       <p class="mt-[5px] flex items-center justify-center gap-2 text-xs text-ink-soft md:hidden" aria-hidden="true">
         <Icon name="arrow-left" class="size-[15px]" /> Desliza para explorar <Icon name="arrow-right" class="size-[15px]" />
@@ -47,3 +68,37 @@ const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
     </Reveal>
   </div>
 </section>
+
+<script>
+  // Flechas de la fila de destacados: avanzan una tarjeta y se desactivan en
+  // los extremos (o cuando el filtro deja menos tarjetas que el ancho).
+  const track = document.querySelector<HTMLElement>('[data-featured-track]')
+  const arrows = document.querySelectorAll<HTMLButtonElement>('[data-featured-arrow]')
+
+  if (track) {
+    const update = () => {
+      const max = track.scrollWidth - track.clientWidth - 2
+      arrows.forEach((arrow) => {
+        arrow.disabled = arrow.dataset.featuredArrow === '-1' ? track.scrollLeft <= 2 : track.scrollLeft >= max
+      })
+    }
+
+    arrows.forEach((arrow) => {
+      arrow.addEventListener('click', () => {
+        // El filtro oculta tarjetas con display:none: se mide la primera visible.
+        const card = [...track.querySelectorAll<HTMLElement>('[data-kind]')].find((el) => el.offsetWidth > 0)
+        const step = (card?.offsetWidth ?? track.clientWidth) + parseFloat(getComputedStyle(track).columnGap || '0')
+        track.scrollBy({ left: Number(arrow.dataset.featuredArrow) * step, behavior: 'smooth' })
+      })
+    })
+
+    track.addEventListener('scroll', update, { passive: true })
+    document.querySelectorAll('input[name="filtro-destacados"]').forEach((input) =>
+      input.addEventListener('change', () => {
+        track.scrollTo({ left: 0 })
+        requestAnimationFrame(update)
+      }),
+    )
+    new ResizeObserver(update).observe(track)
+  }
+</script>

@@ -12,38 +12,40 @@ const navLinkClass = 'inline-flex min-h-11 items-center text-sm font-extrabold t
 ---
 
 <header class="relative z-20 bg-paper shadow-[0_1px_0_rgba(5,28,72,0.09)]">
-  <div
-    class="shell grid min-h-[74px] grid-cols-[44px_1fr_auto_auto] items-center gap-2 md:min-h-[100px] md:grid-cols-[150px_1fr_auto] md:gap-[18px] desk:grid-cols-[190px_minmax(300px,1fr)_auto] desk:gap-9"
-  >
-    <MobileMenu
-      client:media="(max-width: 767px)"
-      before={NAV_BEFORE}
-      shopLabel="Tienda"
-      shop={SHOP_MENU}
-      after={NAV_AFTER}
-      note="Compra profesional, acompañada de verdad."
+  <div class="bg-turquoise">
+    <div
+      class="shell grid min-h-[74px] grid-cols-[44px_1fr_auto_auto] items-center gap-2 md:min-h-[100px] md:grid-cols-[150px_1fr_auto] md:gap-[18px] desk:grid-cols-[190px_minmax(300px,1fr)_auto] desk:gap-9"
     >
-      <ButtonLink slot="cta" href={WHATSAPP_URL} external class="w-full bg-[#087f5b] hover:bg-[#066b4c]">
-        <Icon name="whatsapp" class="size-5" />
-        Asesoría por WhatsApp
-      </ButtonLink>
-    </MobileMenu>
+      <MobileMenu
+        client:media="(max-width: 767px)"
+        before={NAV_BEFORE}
+        shopLabel="Tienda"
+        shop={SHOP_MENU}
+        after={NAV_AFTER}
+        note="Compra profesional, acompañada de verdad."
+      >
+        <ButtonLink slot="cta" href={WHATSAPP_URL} external class="w-full bg-[#087f5b] hover:bg-[#066b4c]">
+          <Icon name="whatsapp" class="size-5" />
+          Asesoría por WhatsApp
+        </ButtonLink>
+      </MobileMenu>
 
-    <a href="/" aria-label="Dog Doggi, ir al inicio" class="justify-self-start py-2">
-      <Logo class="h-[55px] w-[103px] xs:w-[116px] md:h-[72px] md:w-[145px] desk:w-44" />
-    </a>
+      <a href="/" aria-label="Dog Doggi, ir al inicio" class="justify-self-start py-2">
+        <Logo class="h-[55px] w-[103px] xs:w-[116px] md:h-[72px] md:w-[145px] desk:w-44" />
+      </a>
 
-    <SearchBox
-      client:visible
-      placeholder="Busca por producto, marca, medida o referencia…"
-      hints={['tijera', 'shampoo', 'cepillo']}
-    />
+      <SearchBox
+        client:visible
+        placeholder="Busca por producto, marca, medida o referencia…"
+        hints={['tijera', 'shampoo', 'cepillo']}
+      />
 
-    {/* TODO: cuenta, favoritos y carrito sin lógica hasta conectar el ecommerce (CMS). */}
-    <div class="flex items-center md:gap-0 desk:gap-[7px]">
-      <IconButton icon="user" label="Mi cuenta" class="hidden desk:inline-grid" />
-      <IconButton icon="heart" label="Favoritos" count={0} class="hidden md:inline-grid" />
-      <IconButton icon="shopping-bag" label="Carrito de compras" count={0} />
+      {/* TODO: cuenta, favoritos y carrito sin lógica hasta conectar el ecommerce (CMS). */}
+      <div class="flex items-center md:gap-0 desk:gap-[7px]">
+        <IconButton icon="user" label="Mi cuenta" class="hidden desk:inline-grid" />
+        <IconButton icon="heart" label="Favoritos" count={0} class="hidden md:inline-grid" />
+        <IconButton icon="shopping-bag" label="Carrito de compras" count={0} />
+      </div>
     </div>
   </div>
 

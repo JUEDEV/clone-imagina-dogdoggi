@@ -4,13 +4,13 @@ import Carousel from '@/components/islands/Carousel'
 import { HERO_SLIDES } from '@/data/home'
 ---
 
-{/* Carrusel principal: autoplay de 6 s con botón de pausa; los controles flotan sobre el borde inferior de cada slide. */}
+{/* Carrusel principal: autoplay de 6 s que se pausa al pasar el mouse; los controles flotan sobre el borde inferior de cada slide. */}
 <section aria-roledescription="carrusel" aria-label="Destacados" class="relative overflow-hidden">
   <Carousel
     client:visible
     options={{ loop: true }}
     autoplay={6000}
-    pauseButton
+    pauseOnHover
     dots
     dotStyle="bars"
     arrows="end"

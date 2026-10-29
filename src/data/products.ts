@@ -3,7 +3,7 @@
  * endpoint /api/search. Se reemplaza por el ecommerce de Strata al conectar el CMS.
  */
 
-export type ProductKind = 'cosmetica' | 'herramientas'
+export type ProductKind = 'cosmetica' | 'herramientas' | 'equipamiento'
 
 export interface Product {
   id: number
@@ -20,12 +20,15 @@ export interface Product {
 export const PRODUCTS: Product[] = [
   { id: 1, slug: 'shampoo-alisante-natural-2000', name: 'Shampoo alisante natural 2000 ml', category: 'Perfect Groom', price: 68900, image: '/images/products/perfect-groom-shampoo.jpeg', tag: 'Perfect Groom', kind: 'cosmetica' },
   { id: 2, slug: 'tijera-curva-profesional-7-5', name: 'Tijera curva profesional 7.5”', category: 'Tijeras', price: 189000, oldPrice: 219000, image: '/images/products/tijera-curva.png', tag: 'Oferta', kind: 'herramientas' },
-  { id: 3, slug: 'kit-tijeras-peine-metalico', name: 'Kit de tijeras y peine metálico', category: 'Tijeras', price: 249900, image: '/images/products/kit-tijeras.png', tag: 'Nuevo', kind: 'herramientas' },
+  { id: 3, slug: 'kit-tijeras-peine-metalico', name: 'Kit de tijeras y peine metálico', category: 'Tijeras', price: 249900, oldPrice: 289900, image: '/images/products/kit-tijeras.png', tag: 'Nuevo', kind: 'herramientas' },
   { id: 4, slug: 'set-esencial-cepilleria', name: 'Set esencial de cepillería', category: 'Cepillería', price: 159900, oldPrice: 189900, image: '/images/products/set-cepilleria.png', tag: 'Oferta', kind: 'herramientas' },
-  { id: 5, slug: 'shampoo-limpieza-profunda-2000', name: 'Shampoo limpieza profunda 2000 ml', category: 'Perfect Groom', price: 64900, image: '/images/products/perfect-groom-shampoo.jpeg', tag: 'Perfect Groom', kind: 'cosmetica' },
-  { id: 6, slug: 'herramientas-acabado-profesional', name: 'Herramientas para acabado profesional', category: 'Accesorios', price: 119000, image: '/images/products/herramientas-acabado.png', kind: 'herramientas' },
+  { id: 5, slug: 'shampoo-limpieza-profunda-2000', name: 'Shampoo limpieza profunda 2000 ml', category: 'Perfect Groom', price: 64900, oldPrice: 74900, image: '/images/products/perfect-groom-shampoo.jpeg', tag: 'Perfect Groom', kind: 'cosmetica' },
+  { id: 6, slug: 'herramientas-acabado-profesional', name: 'Herramientas para acabado profesional', category: 'Accesorios', price: 119000, oldPrice: 139000, image: '/images/products/herramientas-acabado.png', kind: 'herramientas' },
   { id: 7, slug: 'shampoo-cuidado-pelaje', name: 'Shampoo para cuidado del pelaje', category: 'Cosmética', price: 42900, oldPrice: 49900, image: '/images/products/shampoo-pelaje.png', tag: 'Oferta', kind: 'cosmetica' },
   { id: 8, slug: 'espuma-limpieza-sin-enjuague', name: 'Espuma de limpieza sin enjuague', category: 'Cosmética', price: 38900, oldPrice: 45900, image: '/images/products/espuma-sin-enjuague.png', tag: 'Oferta', kind: 'cosmetica' },
+  // TODO: equipamiento de muestra con fotos de ambiente; reemplazar por recortes reales del catálogo.
+  { id: 9, slug: 'soplador-profesional-alta-potencia', name: 'Soplador profesional de alta potencia', category: 'Secadores y sopladores', price: 459000, oldPrice: 529000, image: '/images/photos/secado-profesional.webp', tag: 'Nuevo', kind: 'equipamiento' },
+  { id: 10, slug: 'mesa-peluqueria-ajustable', name: 'Mesa de peluquería ajustable', category: 'Mesas de corte', price: 689000, image: '/images/photos/puesto-trabajo.webp', kind: 'equipamiento' },
 ]
 
 export const money = (value: number) => `$${value.toLocaleString('es-CO')}`

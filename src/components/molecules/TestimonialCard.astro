@@ -19,7 +19,7 @@ const { testimonial } = Astro.props
   <blockquote class="relative m-0 mb-[38px] font-display text-2xl leading-[1.35] md:text-[clamp(23px,2.4vw,34px)]">
     {testimonial.text}
   </blockquote>
-  <figcaption class="grid grid-cols-[54px_1fr] items-center gap-[15px] md:grid-cols-[64px_1fr_auto]">
+  <figcaption class="grid grid-cols-[54px_1fr] items-center gap-[15px] md:grid-cols-[64px_1fr]">
     <img
       src={testimonial.image}
       alt={`Trabajo de ${testimonial.name}`}
@@ -30,6 +30,5 @@ const { testimonial } = Astro.props
       <strong class="block">{testimonial.name}</strong>
       <span class="block text-xs text-ink-soft">Peluquero canino · {testimonial.city}</span>
     </div>
-    <div class="col-start-2 tracking-[2px] text-[#a87500] md:col-start-auto" role="img" aria-label="5 de 5 estrellas">★★★★★</div>
   </figcaption>
 </figure>

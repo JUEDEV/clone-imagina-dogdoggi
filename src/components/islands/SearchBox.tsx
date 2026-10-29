@@ -84,7 +84,7 @@ export default function SearchBox({
     <div className="flex justify-end md:block md:relative">
       <button
         type="button"
-        className="grid size-11 place-items-center rounded-full transition-colors hover:bg-[#e5f8f7] hover:text-turquoise-dark md:hidden"
+        className="grid size-11 place-items-center rounded-full transition-colors hover:bg-white/35 md:hidden"
         aria-label={mobileOpen ? "Cerrar búsqueda" : "Buscar"}
         aria-expanded={mobileOpen}
         onClick={() => {
@@ -99,7 +99,7 @@ export default function SearchBox({
         role="search"
         onSubmit={onSubmit}
         className={cn(
-          "relative h-[52px] items-center rounded-[15px] border-2 border-turquoise bg-white pl-[17px] md:flex",
+          "relative h-[52px] items-center rounded-[15px] border-2 border-white bg-white pl-[17px] md:flex",
           "max-md:absolute max-md:inset-x-4 max-md:top-[105px] max-md:z-25 max-md:shadow-[0_10px_30px_rgba(5,28,72,0.15)]",
           mobileOpen ? "flex" : "hidden",
         )}

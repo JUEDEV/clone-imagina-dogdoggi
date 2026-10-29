@@ -42,10 +42,10 @@ export default function MobileMenu({ before, shopLabel, shop, after, note, cta }
       <SheetContent side="left" className="w-[min(360px,90vw)] gap-0 overflow-y-auto bg-paper p-5 text-navy">
         <SheetTitle className="sr-only">Menú</SheetTitle>
         <img
-          src="/images/brand/dog-doggi-logo.jpeg"
+          src="/images/brand/dog-doggi-logo.webp"
           alt="Dog Doggi"
-          width={150}
-          height={70}
+          width={600}
+          height={245}
           className="mb-[25px] h-[70px] w-[150px] object-contain"
         />
         <nav className="flex flex-col" aria-label="Navegación móvil">
