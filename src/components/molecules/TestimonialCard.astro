@@ -1,0 +1,35 @@
+---
+import type { Testimonial } from '@/data/home'
+
+// Tarjeta de testimonio (un slide del carrusel de "Nosotros").
+interface Props {
+  testimonial: Testimonial
+}
+
+const { testimonial } = Astro.props
+---
+
+<figure
+  data-carousel-slide
+  class="relative m-0 min-w-0 flex-[0_0_100%] rounded-[20px_50px_20px_20px] bg-paper px-[25px] py-[35px] shadow-[0_20px_60px_rgba(5,28,72,0.08)] md:rounded-[25px_70px_25px_25px] md:p-[55px]"
+>
+  <div aria-hidden="true" class="absolute top-2.5 right-5 font-[Georgia,serif] text-[80px] leading-none text-turquoise md:right-10 md:text-[100px]">
+    “
+  </div>
+  <blockquote class="relative m-0 mb-[38px] font-display text-2xl leading-[1.35] md:text-[clamp(23px,2.4vw,34px)]">
+    {testimonial.text}
+  </blockquote>
+  <figcaption class="grid grid-cols-[54px_1fr] items-center gap-[15px] md:grid-cols-[64px_1fr_auto]">
+    <img
+      src={testimonial.image}
+      alt={`Trabajo de ${testimonial.name}`}
+      loading="lazy"
+      class="size-[54px] rounded-full object-cover md:size-16"
+    />
+    <div>
+      <strong class="block">{testimonial.name}</strong>
+      <span class="block text-xs text-ink-soft">Peluquero canino · {testimonial.city}</span>
+    </div>
+    <div class="col-start-2 tracking-[2px] text-[#a87500] md:col-start-auto" role="img" aria-label="5 de 5 estrellas">★★★★★</div>
+  </figcaption>
+</figure>

@@ -1,0 +1,102 @@
+---
+import {
+  DEFAULT_AUTHOR,
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_THEME_COLOR,
+  DEFAULT_TITLE,
+  SITE_NAME,
+} from '@/lib/seo'
+
+interface Props {
+  title?: string
+  description?: string
+  image?: string
+  imageAlt?: string
+  canonical?: string
+  noindex?: boolean
+  type?: string
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[]
+  /** Imagen LCP del hero de la página (se precarga). */
+  preloadImage?: string
+}
+
+const {
+  title = DEFAULT_TITLE,
+  description = DEFAULT_DESCRIPTION,
+  image = DEFAULT_OG_IMAGE,
+  imageAlt,
+  canonical,
+  noindex = false,
+  type = 'website',
+  jsonLd,
+  preloadImage,
+} = Astro.props
+
+const site = Astro.site
+
+const canonicalURL = (() => {
+  if (canonical) {
+    try {
+      return new URL(canonical).toString()
+    } catch {}
+
+    return site ? new URL(canonical, site).toString() : canonical
+  }
+
+  return site ? new URL(Astro.url.pathname, site).toString() : Astro.url.toString()
+})()
+
+const absoluteImage = (() => {
+  try {
+    return new URL(image).toString()
+  } catch {}
+
+  return site ? new URL(image.startsWith('/') ? image : `/${image}`, site).toString() : image
+})()
+
+const alt = imageAlt || title
+const robots = noindex ? 'noindex,nofollow' : 'index,follow'
+const structuredData = Array.isArray(jsonLd) ? jsonLd.filter(Boolean) : jsonLd ? [jsonLd] : []
+const FONTS_URL =
+  'https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap'
+---
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <meta name="generator" content={Astro.generator} />
+  <link rel="canonical" href={canonicalURL} />
+  <meta name="robots" content={robots} />
+  <meta name="theme-color" content={DEFAULT_THEME_COLOR} />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  {/* Carga no bloqueante: display=swap muestra la fuente del sistema mientras llega la web font. */}
+  <link rel="preload" as="style" href={FONTS_URL} />
+  <link rel="stylesheet" href={FONTS_URL} media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href={FONTS_URL} /></noscript>
+  {preloadImage && <link rel="preload" as="image" href={preloadImage} fetchpriority="high" />}
+  <link rel="icon" type="image/jpeg" href="/images/brand/dog-doggi-logo.jpeg" />
+
+  <meta name="author" content={DEFAULT_AUTHOR} />
+
+  <meta property="og:locale" content="es_CO" />
+  <meta property="og:type" content={type} />
+  <meta property="og:site_name" content={SITE_NAME} />
+  <meta property="og:url" content={canonicalURL} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={absoluteImage} />
+  <meta property="og:image:alt" content={alt} />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={absoluteImage} />
+  <meta name="twitter:image:alt" content={alt} />
+
+  {structuredData.map((entry) => <script type="application/ld+json" set:html={JSON.stringify(entry)} />)}
+</head>

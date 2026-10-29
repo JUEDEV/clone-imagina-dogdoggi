@@ -1,0 +1,42 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import { articleHref, formatDate, type Article } from '@/data/blog'
+
+// Tarjeta de artículo para la vitrina del home, el índice y los relacionados.
+interface Props {
+  article: Article
+  /** Nivel del titular: h3 dentro de una sección, h2 en el índice. */
+  headingLevel?: 'h2' | 'h3'
+}
+
+const { article, headingLevel: Heading = 'h3' } = Astro.props
+const href = articleHref(article)
+---
+
+<article class="group/article overflow-hidden">
+  <a href={href} class="block h-[220px] overflow-hidden rounded-[18px] md:h-[225px]" tabindex="-1" aria-hidden="true">
+    <img
+      src={article.image}
+      alt=""
+      loading="lazy"
+      class="h-full w-full object-cover transition-transform duration-300 group-hover/article:scale-[1.04]"
+    />
+  </a>
+  <div class="px-1 py-[18px]">
+    <span class="text-[10px] font-extrabold tracking-[0.08em] text-turquoise-dark uppercase">{article.category}</span>
+    <Heading class="mt-2 mb-2.5 text-[23px] leading-[1.2] font-medium">
+      <a href={href} class="hover:text-turquoise-dark">{article.title}</a>
+    </Heading>
+    <p class="line-clamp-2 text-sm text-ink-soft">{article.excerpt}</p>
+    <div class="flex items-center justify-between gap-2.5 border-t border-line pt-2.5">
+      <small class="flex items-center gap-1.5 text-[11px] text-ink-soft">
+        <Icon name="clock" class="size-3.5" />
+        <time datetime={article.date}>{formatDate(article.date)}</time>
+      </small>
+      <a href={href} class="inline-flex min-h-11 items-center gap-[7px] text-[13px] font-extrabold hover:text-orange-dark">
+        Leer más <span class="sr-only">sobre {article.title}</span>
+        <Icon name="arrow-up-right" class="size-[17px]" />
+      </a>
+    </div>
+  </div>
+</article>

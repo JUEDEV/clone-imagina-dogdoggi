@@ -1,0 +1,45 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import Logo from '@/components/atoms/Logo.astro'
+import FooterColumn from '@/components/molecules/FooterColumn.astro'
+import { FOOTER_COLUMNS, PAYMENT_MARKS, SOCIAL } from '@/data/site'
+import { SITE_NAME } from '@/lib/seo'
+
+const year = new Date().getFullYear()
+---
+
+<footer id="contacto" class="bg-navy pt-[65px] text-[#f1f8fb]">
+  <div class="shell grid grid-cols-2 gap-x-[25px] gap-y-[35px] pb-[55px] md:grid-cols-[1.7fr_repeat(3,1fr)] md:gap-[30px] desk:gap-[60px]">
+    <div class="col-span-full md:col-span-1">
+      <Logo plate class="mb-5 h-20 w-[175px]" />
+      <p class="max-w-[350px] text-sm text-[#c7d4e6]">
+        Herramientas, equipos y cosmética para quienes hacen de cada peluquería un lugar extraordinario.
+      </p>
+      <div class="flex gap-2">
+        {SOCIAL.map((social) => (
+          <a
+            href={social.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={social.label}
+            class="grid size-11 place-items-center rounded-full border border-[#53617b] transition-colors hover:bg-turquoise hover:text-navy"
+          >
+            <Icon name={social.icon} class="size-[19px]" />
+          </a>
+        ))}
+      </div>
+    </div>
+    {FOOTER_COLUMNS.map((column, i) => (
+      <FooterColumn title={column.title} links={column.links} class={i === FOOTER_COLUMNS.length - 1 ? 'col-span-full md:col-span-1' : undefined} />
+    ))}
+  </div>
+  <div class="shell flex min-h-20 flex-col items-start gap-3 border-t border-[#34425d] pt-[25px] pb-[95px] text-[11px] text-[#b8c7da] md:flex-row md:items-center md:justify-between md:gap-5 md:py-0">
+    <span>© {year} {SITE_NAME}. Todos los derechos reservados.</span>
+    <div class="flex gap-[7px]" aria-label="Medios de pago">
+      {PAYMENT_MARKS.map((mark) => (
+        <span class="min-w-[42px] rounded border border-[#617089] px-[7px] py-[3px] text-center font-extrabold text-white">{mark}</span>
+      ))}
+    </div>
+    <span>Hecho para expertos en consentir peludos.</span>
+  </div>
+</footer>

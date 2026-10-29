@@ -1,0 +1,15 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import { WHATSAPP_URL } from '@/data/site'
+---
+
+<a
+  href={WHATSAPP_URL}
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Pedir asesoría por WhatsApp"
+  class="fixed right-[max(22px,env(safe-area-inset-right))] bottom-[max(22px,env(safe-area-inset-bottom))] z-15 flex size-[54px] items-center justify-center gap-2 rounded-full bg-[#087f5b] text-[13px] font-extrabold text-white shadow-[0_8px_30px_rgba(5,28,72,0.22)] md:h-auto md:min-h-[52px] md:w-auto md:px-[18px] md:py-3"
+>
+  <Icon name="whatsapp" class="size-6" />
+  <span class="hidden md:inline">¿Te asesoramos?</span>
+</a>

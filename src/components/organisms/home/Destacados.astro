@@ -1,0 +1,49 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import Reveal from '@/components/atoms/Reveal.astro'
+import ProductCard from '@/components/molecules/ProductCard.astro'
+import SectionHeading from '@/components/molecules/SectionHeading.astro'
+import { PRODUCTS, type ProductKind } from '@/data/products'
+
+// Filtro sin JS: radios + :has(). La fila es un scroll-snap nativo (no hace
+// falta Embla para deslizar), así que la sección no envía JavaScript.
+const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
+  { id: 'filtro-todos', label: 'Más vendidos' },
+  { id: 'filtro-herramientas', label: 'Herramientas', kind: 'herramientas' },
+  { id: 'filtro-cosmetica', label: 'Cosmética', kind: 'cosmetica' },
+]
+---
+
+<section id="destacados" class="bg-paper py-16 md:py-24">
+  <div class="shell">
+    <Reveal>
+      <SectionHeading text="Selección profesional para comprar una y otra vez.">Los favoritos de los expertos</SectionHeading>
+    </Reveal>
+
+    <Reveal delay={120} class="group/filters">
+      <fieldset class="scrollbar-none mb-7 flex gap-2 overflow-x-auto pb-[3px] md:overflow-visible md:pb-0">
+        <legend class="sr-only">Filtrar productos</legend>
+        {FILTERS.map((filter, i) => (
+          <span class="shrink-0">
+            <input type="radio" name="filtro-destacados" id={filter.id} class="peer sr-only" checked={i === 0} />
+            <label
+              for={filter.id}
+              class="inline-flex min-h-11 cursor-pointer items-center rounded-3xl border border-line px-[18px] py-2 text-sm font-extrabold whitespace-nowrap transition-colors peer-checked:border-navy peer-checked:bg-navy peer-checked:text-white peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-navy"
+            >
+              {filter.label}
+            </label>
+          </span>
+        ))}
+      </fieldset>
+
+      <div
+        class="grid auto-cols-[76%] grid-flow-col gap-3 overflow-x-auto px-0.5 pt-1 pb-5 [scrollbar-width:thin] snap-x snap-mandatory md:auto-cols-[calc((100%-48px)/4)] md:gap-4 group-has-[#filtro-cosmetica:checked]/filters:[&_[data-kind=herramientas]]:hidden group-has-[#filtro-herramientas:checked]/filters:[&_[data-kind=cosmetica]]:hidden"
+      >
+        {PRODUCTS.map((product) => <ProductCard product={product} class="snap-start" />)}
+      </div>
+      <p class="mt-[5px] flex items-center justify-center gap-2 text-xs text-ink-soft md:hidden" aria-hidden="true">
+        <Icon name="arrow-left" class="size-[15px]" /> Desliza para explorar <Icon name="arrow-right" class="size-[15px]" />
+      </p>
+    </Reveal>
+  </div>
+</section>

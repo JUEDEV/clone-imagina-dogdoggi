@@ -1,0 +1,18 @@
+---
+// Logo de Dog Doggi. El JPEG trae fondo blanco, así que sobre navy se pinta
+// dentro de una "placa" blanca (`plate`).
+interface Props {
+  class?: string
+  plate?: boolean
+}
+
+const { class: className = 'h-[72px] w-44', plate = false } = Astro.props
+---
+
+<img
+  src="/images/brand/dog-doggi-logo.jpeg"
+  alt="Dog Doggi"
+  width="176"
+  height="72"
+  class:list={['object-contain', plate && 'rounded-[14px] bg-white', className]}
+/>

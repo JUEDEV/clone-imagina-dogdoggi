@@ -1,0 +1,30 @@
+---
+import type { Crumb } from '@/lib/seo'
+
+// Ruta de navegación sobre el hero de las páginas internas. El último ítem es la página actual.
+interface Props {
+  items: Crumb[]
+}
+
+const { items } = Astro.props
+---
+
+<nav aria-label="Ruta de navegación" class="mb-5">
+  <ol class="flex flex-wrap items-center gap-2 text-xs font-extrabold tracking-[0.08em] text-ink-soft uppercase">
+    {items.map((item, i) => {
+      const last = i === items.length - 1
+      return (
+        <>
+          {i > 0 && <li aria-hidden="true" class="text-turquoise-dark">/</li>}
+          {last || !item.href ? (
+            <li aria-current={last ? 'page' : undefined} class="text-navy">{item.label}</li>
+          ) : (
+            <li>
+              <a href={item.href} class="transition-colors hover:text-orange-dark">{item.label}</a>
+            </li>
+          )}
+        </>
+      )
+    })}
+  </ol>
+</nav>

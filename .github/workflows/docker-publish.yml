@@ -1,0 +1,46 @@
+name: Docker Build & Push
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: docker-publish-main
+  cancel-in-progress: false
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.REGISTRY_HOST }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.REGISTRY_HOST }}/imaginadevs/frontend-dog-doggi:latest
+            ${{ secrets.REGISTRY_HOST }}/imaginadevs/frontend-dog-doggi:${{ github.sha }}
+          # Si la variable no existe se usa el dominio de producción (un build-arg
+          # vacío pisaría el valor por defecto del Dockerfile).
+          build-args: |
+            PUBLIC_SITE_URL=${{ vars.PUBLIC_SITE_URL || 'https://dogdoggi.com' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

@@ -1,0 +1,33 @@
+---
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import TestimonialCard from '@/components/molecules/TestimonialCard.astro'
+import Carousel from '@/components/islands/Carousel'
+import { TESTIMONIALS } from '@/data/home'
+---
+
+{/* La intro va en el slot `header` para que las flechas y el contador queden bajo el titular en escritorio. */}
+<section id="nosotros" class="overflow-hidden bg-mint py-16 md:py-24">
+  <div class="shell">
+    <Carousel
+      client:visible
+      options={{ loop: true }}
+      arrows="header"
+      counter
+      prevLabel="Testimonio anterior"
+      nextLabel="Testimonio siguiente"
+      revealDelay={{ arrows: 120, viewport: 120 }}
+      className="grid gap-[25px] md:grid-cols-[0.85fr_1.15fr] md:items-center md:gap-[35px] desk:gap-20 [&>*]:min-w-0"
+      headerClassName="flex flex-col items-start"
+      viewportClassName="-my-8 overflow-hidden py-8"
+      trackClassName="flex"
+    >
+      <div slot="header" class="reveal">
+        <Eyebrow>Ellos ya trabajan con nosotros</Eyebrow>
+        <h2 class="mt-[18px] mb-[30px] text-[39px] leading-[1.06] font-semibold md:text-[clamp(36px,4vw,54px)]">
+          Manos expertas.<br />Historias que nos<br />hacen crecer.
+        </h2>
+      </div>
+      {TESTIMONIALS.map((testimonial) => <TestimonialCard testimonial={testimonial} />)}
+    </Carousel>
+  </div>
+</section>

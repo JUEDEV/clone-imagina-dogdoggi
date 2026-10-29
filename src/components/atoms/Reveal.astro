@@ -1,0 +1,18 @@
+---
+import type { HTMLTag } from 'astro/types'
+
+// Fade-up suave al entrar en pantalla (una sola vez). El observer vive en
+// Layout.astro; aquí solo se marca el elemento con .reveal y su retraso.
+interface Props {
+  as?: HTMLTag
+  /** Retraso en ms */
+  delay?: number
+  class?: string
+}
+
+const { as: Tag = 'div', delay = 0, class: className } = Astro.props
+---
+
+<Tag class:list={['reveal', className]} style={delay ? `--reveal-delay: ${delay}ms` : undefined}>
+  <slot />
+</Tag>

@@ -1,0 +1,32 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import { cn } from '@/lib/utils'
+
+// Botón-enlace de la plantilla (esquinas de 13px, peso 800). Variantes:
+// solid (naranja), outline (navy sobre claro), outline-light (blanco sobre oscuro).
+// `class` se fusiona con tailwind-merge, así que puede sobrescribir tamaños.
+interface Props extends HTMLAttributes<'a'> {
+  variant?: 'solid' | 'outline' | 'outline-light'
+  external?: boolean
+}
+
+const { variant = 'solid', external = false, class: className, ...rest } = Astro.props
+
+const variants = {
+  solid: 'bg-orange text-white hover:-translate-y-0.5 hover:bg-orange-dark',
+  outline: 'border-navy text-navy hover:bg-navy hover:text-white',
+  'outline-light': 'border-white text-white hover:bg-white hover:text-navy',
+}
+---
+
+<a
+  class={cn(
+    'inline-flex min-h-[50px] items-center justify-center gap-3 rounded-[13px] border-2 border-transparent px-[22px] py-3 font-extrabold transition-all duration-200',
+    variants[variant],
+    className,
+  )}
+  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+  {...rest}
+>
+  <slot />
+</a>

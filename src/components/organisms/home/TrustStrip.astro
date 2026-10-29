@@ -1,0 +1,10 @@
+---
+import TrustItem from '@/components/molecules/TrustItem.astro'
+import { TRUST_ITEMS } from '@/data/home'
+---
+
+<section aria-label="Por qué comprar en Dog Doggi" class="bg-turquoise py-5 md:py-[35px]">
+  <div class="shell grid grid-cols-2 md:grid-cols-4">
+    {TRUST_ITEMS.map((item) => <TrustItem item={item} />)}
+  </div>
+</section>

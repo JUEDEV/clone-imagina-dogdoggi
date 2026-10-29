@@ -1,0 +1,32 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Accent from '@/components/atoms/Accent.astro'
+import ButtonLink from '@/components/atoms/ButtonLink.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import { WHATSAPP_URL } from '@/data/site'
+import { buildTitle } from '@/lib/seo'
+
+export const prerender = true
+---
+
+<Layout title={buildTitle('Página no encontrada')} noindex>
+  <main id="main-content" class="flex min-h-[70svh] items-center justify-center bg-sky px-4 py-20 text-center">
+    <div>
+      <p class="font-display text-7xl font-semibold text-pg-blue md:text-8xl">404</p>
+      <h1 class="mt-4 text-[34px] leading-[1.1] font-semibold md:text-5xl">
+        Esta página se fue<br /><Accent class="text-orange-dark">a dar un paseo.</Accent>
+      </h1>
+      <p class="mx-auto mt-5 max-w-md text-ink-soft">Volvamos a la tienda o escríbenos y te ayudamos a encontrar lo que buscas.</p>
+      <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+        <ButtonLink href="/">
+          Volver al inicio
+          <Icon name="arrow-right" class="size-[18px]" />
+        </ButtonLink>
+        <ButtonLink href={WHATSAPP_URL} external variant="outline">
+          <Icon name="whatsapp" class="size-5" />
+          Escríbenos
+        </ButtonLink>
+      </div>
+    </div>
+  </main>
+</Layout>

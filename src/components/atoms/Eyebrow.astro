@@ -1,0 +1,13 @@
+---
+// Antetítulo en versalitas de la plantilla. El color se pasa por `class`
+// porque cambia en cada sección (turquesa, naranja, azul Perfect Groom…).
+interface Props {
+  class?: string
+}
+
+const { class: className = 'text-turquoise-dark' } = Astro.props
+---
+
+<span class:list={['inline-block text-[11px] font-extrabold uppercase tracking-[0.12em]', className]}>
+  <slot />
+</span>

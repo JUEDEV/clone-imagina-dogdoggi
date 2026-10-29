@@ -1,0 +1,27 @@
+---
+import HeroSlide from '@/components/molecules/HeroSlide.astro'
+import Carousel from '@/components/islands/Carousel'
+import { HERO_SLIDES } from '@/data/home'
+---
+
+{/* Carrusel principal: autoplay de 6 s con botón de pausa; los controles flotan sobre el borde inferior de cada slide. */}
+<section aria-roledescription="carrusel" aria-label="Destacados" class="relative overflow-hidden">
+  <Carousel
+    client:visible
+    options={{ loop: true }}
+    autoplay={6000}
+    pauseButton
+    dots
+    dotStyle="bars"
+    arrows="end"
+    prevLabel="Diapositiva anterior"
+    nextLabel="Diapositiva siguiente"
+    dotLabel="Ir a diapositiva {n}"
+    className="relative"
+    viewportClassName="overflow-hidden"
+    trackClassName="flex"
+    controlsClassName="shell absolute inset-x-0 bottom-0 z-10"
+  >
+    {HERO_SLIDES.map((slide, i) => <HeroSlide slide={slide} first={i === 0} />)}
+  </Carousel>
+</section>

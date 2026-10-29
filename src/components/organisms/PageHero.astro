@@ -1,0 +1,55 @@
+---
+import Reveal from '@/components/atoms/Reveal.astro'
+import Breadcrumb from '@/components/molecules/Breadcrumb.astro'
+import type { Crumb } from '@/lib/seo'
+
+// Hero de las páginas internas: fondo suave, ruta de navegación, titular
+// (slot por defecto), bajada y foto opcional a la derecha.
+// Slots: `meta` (sobre el titular, p. ej. categoría del artículo) y `actions` (botones).
+interface Props {
+  crumbs: Crumb[]
+  support?: string
+  image?: string
+  alt?: string
+  titleClass?: string
+}
+
+const { crumbs, support, image, alt = '', titleClass = 'text-[40px] md:text-[clamp(44px,4.5vw,64px)]' } = Astro.props
+const hasMeta = Astro.slots.has('meta')
+---
+
+<section class="bg-sky py-12 md:py-16">
+  <div class:list={['shell grid items-center gap-8', image && 'md:grid-cols-[1.1fr_0.9fr] md:gap-12']}>
+    <div>
+      <Reveal>
+        <Breadcrumb items={crumbs} />
+      </Reveal>
+      <Reveal delay={120}>
+        <slot name="meta" />
+        <h1 class:list={['leading-[1.05] font-semibold tracking-[-0.03em]', hasMeta && 'mt-3', titleClass]}>
+          <slot />
+        </h1>
+      </Reveal>
+      {support && (
+        <Reveal delay={200}>
+          <p class="mt-5 max-w-[560px] text-base leading-relaxed text-[#233a59] md:text-lg">{support}</p>
+        </Reveal>
+      )}
+      {Astro.slots.has('actions') && (
+        <Reveal delay={280} class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <slot name="actions" />
+        </Reveal>
+      )}
+    </div>
+    {image && (
+      <Reveal delay={160}>
+        <img
+          src={image}
+          alt={alt}
+          fetchpriority="high"
+          class="h-[260px] w-full rounded-[35%_14px_35%_14px] object-cover md:h-[380px] md:rounded-[45%_18px_45%_18px]"
+        />
+      </Reveal>
+    )}
+  </div>
+</section>

@@ -1,0 +1,27 @@
+---
+import type { ArticleBlock } from '@/data/blog'
+
+// Un bloque del cuerpo de un artículo (párrafo, subtítulo, cita o lista).
+interface Props {
+  block: ArticleBlock
+}
+
+const { block } = Astro.props
+---
+
+{block.type === 'p' && <p class="mb-6 text-[17px] leading-[1.75] text-[#233a59]">{block.text}</p>}
+{block.type === 'h2' && <h2 class="mt-10 mb-4 text-[26px] leading-[1.2] font-semibold md:text-[30px]">{block.text}</h2>}
+{block.type === 'quote' && (
+  <blockquote class="my-8 rounded-[20px_40px_20px_20px] bg-mint px-7 py-6 font-display text-[22px] leading-[1.35] md:text-2xl">
+    {block.text}
+  </blockquote>
+)}
+{block.type === 'list' && (
+  <ul class="mb-6 grid list-none gap-3 p-0">
+    {block.items.map((item) => (
+      <li class="relative pl-7 text-[17px] leading-[1.7] text-[#233a59] before:absolute before:top-[0.6em] before:left-1 before:size-2.5 before:rounded-full before:bg-turquoise">
+        {item}
+      </li>
+    ))}
+  </ul>
+)}

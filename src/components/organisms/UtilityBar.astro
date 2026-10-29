@@ -1,0 +1,14 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import { WHATSAPP_URL } from '@/data/site'
+---
+
+<div class="bg-navy text-xs font-bold text-[#f3fbfb] md:text-[13px]">
+  <div class="shell flex min-h-8 items-center justify-center gap-10 md:min-h-9">
+    <span class="inline-flex items-center gap-[7px]"><Icon name="truck" class="size-[15px]" /> Envíos a todo el país</span>
+    <span class="hidden items-center gap-[7px] md:inline-flex"><Icon name="shield-check" class="size-[15px]" /> Pago seguro</span>
+    <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" class="hidden items-center gap-[7px] p-1.5 md:inline-flex">
+      <Icon name="message-circle" class="size-[15px]" /> Asesoría por WhatsApp
+    </a>
+  </div>
+</div>

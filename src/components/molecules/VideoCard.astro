@@ -1,0 +1,52 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import type { Video } from '@/data/home'
+
+// Tarjeta de video. `featured`: foto grande con degradado y título encima;
+// si no, fila con miniatura a la izquierda. Abre el video en YouTube.
+interface Props {
+  video: Video
+  featured?: boolean
+}
+
+const { video, featured = false } = Astro.props
+---
+
+{featured ? (
+  <a
+    href={video.href}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="relative block min-h-[370px] overflow-hidden rounded-[22px] text-white after:absolute after:inset-[35%_0_0] after:bg-gradient-to-b after:from-transparent after:to-navy/90 md:min-h-[480px]"
+  >
+    <img src={video.image} alt={video.alt} loading="lazy" class="absolute h-full w-full object-cover" />
+    <span class="absolute top-[42%] left-1/2 z-[2] grid size-[76px] -translate-1/2 place-items-center rounded-full bg-orange">
+      <Icon name="play" filled class="ml-[5px] size-6" />
+    </span>
+    <div class="absolute right-5 bottom-5 left-[22px] z-[2] md:right-auto md:bottom-[25px] md:left-[35px]">
+      <small class="font-extrabold tracking-[0.1em]">VIDEO DESTACADO · {video.duration}</small>
+      <h3 class="mt-1.5 text-[25px] font-semibold md:text-[30px]">{video.title}</h3>
+    </div>
+  </a>
+) : (
+  <a
+    href={video.href}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="grid min-h-[145px] flex-1 grid-cols-[44%_1fr] items-center gap-[18px] rounded-2xl bg-[#eef4f6] p-3"
+  >
+    <div class="relative h-full min-h-[120px]">
+      <img src={video.image} alt={video.alt} loading="lazy" class="h-full w-full rounded-[10px] object-cover" />
+      <span class="absolute top-1/2 left-1/2 grid size-[42px] -translate-1/2 place-items-center rounded-full bg-orange text-white">
+        <Icon name="play" filled class="size-[17px]" />
+      </span>
+    </div>
+    <div>
+      <small class="text-[11px] text-ink-soft">{video.duration}</small>
+      <h3 class="mt-1.5 mb-3 text-[17px] leading-[1.2] font-semibold md:text-xl">{video.title}</h3>
+      <p class="m-0 flex items-center gap-1.5 text-xs font-extrabold">
+        Ver video <Icon name="arrow-up-right" class="size-[15px]" />
+      </p>
+    </div>
+  </a>
+)}

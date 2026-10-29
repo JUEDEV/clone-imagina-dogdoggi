@@ -1,0 +1,67 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import PageHero from '@/components/organisms/PageHero.astro'
+import ArticleBody from '@/components/organisms/blog/ArticleBody.astro'
+import RelatedArticles from '@/components/organisms/blog/RelatedArticles.astro'
+import CtaCierre from '@/components/organisms/CtaCierre.astro'
+import { ARTICLES, formatDate, type Article } from '@/data/blog'
+import { SITE_NAME, breadcrumbJsonLd, buildTitle, type Crumb } from '@/lib/seo'
+
+export const prerender = true
+
+export function getStaticPaths() {
+  return ARTICLES.map((article) => ({ params: { slug: article.slug }, props: { article } }))
+}
+
+interface Props {
+  article: Article
+}
+
+const { article } = Astro.props
+const crumbs: Crumb[] = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Blog', href: '/blog' },
+  { label: article.category },
+]
+const abs = (path: string) => (Astro.site ? new URL(path, Astro.site).toString() : path)
+const jsonLd = [
+  breadcrumbJsonLd(crumbs, Astro.site, Astro.url.pathname),
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: article.title,
+    description: article.excerpt,
+    image: abs(article.image),
+    datePublished: article.date,
+    mainEntityOfPage: abs(Astro.url.pathname),
+    publisher: { '@type': 'Organization', name: SITE_NAME, logo: abs('/images/brand/dog-doggi-logo.jpeg') },
+  },
+]
+---
+
+<Layout
+  title={buildTitle(article.title)}
+  description={article.excerpt}
+  image={article.image}
+  preloadImage={article.image}
+  type="article"
+  jsonLd={jsonLd}
+>
+  <main id="main-content">
+    <PageHero crumbs={crumbs} image={article.image} alt={article.alt} titleClass="text-[34px] md:text-[clamp(36px,3.6vw,52px)]">
+      <div slot="meta" class="flex flex-wrap items-center gap-4">
+        <Eyebrow>{article.category}</Eyebrow>
+        <span class="flex items-center gap-1.5 text-xs text-ink-soft">
+          <Icon name="clock" class="size-3.5" />
+          <time datetime={article.date}>{formatDate(article.date)}</time>
+        </span>
+      </div>
+      {article.title}
+    </PageHero>
+    <ArticleBody article={article} />
+    <RelatedArticles current={article.slug} />
+    <CtaCierre />
+  </main>
+</Layout>

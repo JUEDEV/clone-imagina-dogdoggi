@@ -1,0 +1,48 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import HeroSlider from '@/components/organisms/home/HeroSlider.astro'
+import Categorias from '@/components/organisms/home/Categorias.astro'
+import PerfectGroom from '@/components/organisms/home/PerfectGroom.astro'
+import Destacados from '@/components/organisms/home/Destacados.astro'
+import Ofertas from '@/components/organisms/home/Ofertas.astro'
+import TrustStrip from '@/components/organisms/home/TrustStrip.astro'
+import BlogPreview from '@/components/organisms/home/BlogPreview.astro'
+import Testimonios from '@/components/organisms/home/Testimonios.astro'
+import Videos from '@/components/organisms/home/Videos.astro'
+import { HERO_SLIDES } from '@/data/home'
+import { SOCIAL } from '@/data/site'
+import { DEFAULT_DESCRIPTION, DEFAULT_OG_IMAGE, DEFAULT_TITLE, SITE_NAME } from '@/lib/seo'
+
+export const prerender = true
+
+const abs = (path: string) => (Astro.site ? new URL(path, Astro.site).toString() : path)
+// TODO: agregar teléfono, dirección y redes reales cuando estén confirmados.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'PetStore',
+  name: SITE_NAME,
+  description: DEFAULT_DESCRIPTION,
+  url: abs('/'),
+  logo: abs('/images/brand/dog-doggi-logo.jpeg'),
+  image: abs(DEFAULT_OG_IMAGE),
+  areaServed: { '@type': 'Country', name: 'Colombia' },
+  currenciesAccepted: 'COP',
+  sameAs: SOCIAL.map((social) => social.href),
+}
+
+const first = HERO_SLIDES[0].art
+---
+
+<Layout title={DEFAULT_TITLE} preloadImage={first.photo} jsonLd={jsonLd}>
+  <main id="main-content">
+    <HeroSlider />
+    <Categorias />
+    <PerfectGroom />
+    <Destacados />
+    <Ofertas />
+    <TrustStrip />
+    <BlogPreview />
+    <Testimonios />
+    <Videos />
+  </main>
+</Layout>

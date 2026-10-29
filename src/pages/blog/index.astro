@@ -1,0 +1,29 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import PageHero from '@/components/organisms/PageHero.astro'
+import ArticleGrid from '@/components/organisms/blog/ArticleGrid.astro'
+import CtaCierre from '@/components/organisms/CtaCierre.astro'
+import { breadcrumbJsonLd, buildTitle, type Crumb } from '@/lib/seo'
+
+export const prerender = true
+
+const crumbs: Crumb[] = [{ label: 'Inicio', href: '/' }, { label: 'Blog' }]
+const description = 'Tips, técnicas y productos para seguir creciendo como peluquero canino.'
+const image = '/images/photos/peluquero-corte.webp'
+---
+
+<Layout
+  title={buildTitle('Blog')}
+  description={description}
+  image={image}
+  preloadImage={image}
+  jsonLd={breadcrumbJsonLd(crumbs, Astro.site, Astro.url.pathname)}
+>
+  <main id="main-content">
+    <PageHero crumbs={crumbs} support={description} image={image} alt="Peluquero canino recortando el pelaje de un perro">
+      Aprende con Dog Doggi
+    </PageHero>
+    <ArticleGrid />
+    <CtaCierre />
+  </main>
+</Layout>

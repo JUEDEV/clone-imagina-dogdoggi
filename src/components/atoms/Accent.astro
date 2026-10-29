@@ -1,0 +1,10 @@
+---
+// Segunda línea destacada de los titulares (sin cursiva, solo color).
+interface Props {
+  class?: string
+}
+
+const { class: className = 'text-pg-blue' } = Astro.props
+---
+
+<em class:list={['not-italic', className]}><slot /></em>

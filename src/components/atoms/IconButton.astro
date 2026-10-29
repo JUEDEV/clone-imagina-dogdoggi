@@ -1,0 +1,33 @@
+---
+import type { HTMLAttributes } from 'astro/types'
+import Icon from '@/components/atoms/Icon.astro'
+import type { IconName } from '@/lib/icons'
+import { cn } from '@/lib/utils'
+
+// Botón circular de 44px con ícono (acciones del header). Si recibe `href`
+// se pinta como enlace; si no, como botón.
+// TODO: cuenta, favoritos y carrito quedan sin lógica hasta conectar el
+// ecommerce de Strata (skill conectar-cms); `count` muestra la burbuja.
+interface Props extends HTMLAttributes<'button'> {
+  icon: IconName
+  label: string
+  href?: string
+  count?: number
+}
+
+const { icon, label, href, count, class: className, ...rest } = Astro.props
+const classes = cn(
+  'relative inline-grid size-11 place-items-center rounded-full transition-[background,color,transform] duration-200 hover:bg-[#e5f8f7] hover:text-turquoise-dark active:scale-95',
+  className,
+)
+const Tag = href ? 'a' : 'button'
+---
+
+<Tag class={classes} aria-label={label} {...(href ? { href } : { type: 'button', ...rest })}>
+  <Icon name={icon} class="size-[22px]" />
+  {count !== undefined && (
+    <span class="absolute -right-px -top-px grid h-[19px] min-w-[19px] place-items-center rounded-full border-2 border-paper bg-orange px-1 text-[10px] font-extrabold text-white">
+      {count}
+    </span>
+  )}
+</Tag>

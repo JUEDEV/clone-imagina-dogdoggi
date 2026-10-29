@@ -1,0 +1,17 @@
+---
+import ArticleBlock from '@/components/molecules/ArticleBlock.astro'
+import type { Article } from '@/data/blog'
+
+interface Props {
+  article: Article
+}
+
+const { article } = Astro.props
+---
+
+<article class="py-14 md:py-20">
+  <div class="shell max-w-[760px]">
+    <p class="mb-8 font-display text-xl leading-[1.5] md:text-[22px]">{article.excerpt}</p>
+    {article.content.map((block) => <ArticleBlock block={block} />)}
+  </div>
+</article>

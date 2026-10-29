@@ -1,0 +1,25 @@
+---
+import { externalAttrs, type NavItem } from '@/data/site'
+
+// Columna de enlaces del footer.
+interface Props {
+  title: string
+  links: NavItem[]
+  class?: string
+}
+
+const { title, links, class: className } = Astro.props
+---
+
+<div class:list={['flex flex-col items-start gap-[7px]', className]}>
+  <h3 class="mb-3 text-lg font-semibold text-turquoise">{title}</h3>
+  {links.map((link) => (
+    <a
+      href={link.href}
+      {...externalAttrs(link)}
+      class="flex min-h-11 min-w-11 items-center py-[3px] text-[13px] text-[#d8e2ed] hover:text-white hover:underline md:min-h-[34px]"
+    >
+      {link.label}
+    </a>
+  ))}
+</div>

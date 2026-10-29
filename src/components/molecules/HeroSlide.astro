@@ -1,0 +1,93 @@
+---
+import Accent from '@/components/atoms/Accent.astro'
+import ButtonLink from '@/components/atoms/ButtonLink.astro'
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import type { HeroSlide, HeroTheme } from '@/data/home'
+
+// Slide del hero principal. Cada tema trae su fondo y color de acento; el arte
+// de la derecha cambia según `art.kind`. Solo el primer slide lleva h1 y su
+// imagen se carga con prioridad (es el LCP).
+interface Props {
+  slide: HeroSlide
+  first?: boolean
+}
+
+const { slide, first = false } = Astro.props
+const { art } = slide
+
+const themes: Record<HeroTheme, { bg: string; accent: string }> = {
+  perfect: { bg: 'bg-sky', accent: 'text-pg-blue' },
+  tools: { bg: 'bg-[#e8f7f6]', accent: 'text-turquoise-dark' },
+  offers: { bg: 'bg-[#fff2e8]', accent: 'text-orange-dark' },
+}
+const theme = themes[slide.theme]
+const eyebrowClass = slide.theme === 'perfect' ? 'text-[#006e9e]' : theme.accent
+const Heading = first ? 'h1' : 'h2'
+const imgLoading = first ? { fetchpriority: 'high' as const } : { loading: 'lazy' as const }
+const wide =
+  'absolute inset-x-0 top-[25px] bottom-2.5 h-60 w-full rounded-[35%_14px_35%_14px] object-cover md:inset-[35px_0_35px_30px] md:h-[calc(100%-70px)] md:w-[calc(100%-30px)] md:rounded-[45%_18px_45%_18px]'
+---
+
+<div
+  data-carousel-slide
+  data-active={first ? 'true' : 'false'}
+  class:list={['min-w-0 flex-[0_0_100%] pb-[60px]', theme.bg]}
+>
+  <div class="shell flex min-h-[605px] flex-col md:grid md:min-h-[520px] md:grid-cols-2 md:items-center md:gap-[30px] desk:grid-cols-[0.9fr_1.1fr]">
+    <div class="hero-copy relative z-[3] max-w-full pt-[42px] md:max-w-[610px] md:pt-[50px] md:pb-5">
+      <Eyebrow class:list={['mb-3 text-[11px] md:mb-[18px] md:text-[13px]', eyebrowClass]}>{slide.eyebrow}</Eyebrow>
+      <Heading
+        class="mb-[15px] text-[38px] leading-[1.02] font-semibold tracking-[-0.035em] xs:text-[clamp(38px,11vw,50px)] md:mb-5 md:text-[clamp(44px,4.5vw,72px)]"
+      >
+        {slide.title}<br /><Accent class={theme.accent}>{slide.accent}</Accent>
+      </Heading>
+      <p class="mb-[22px] max-w-[94%] text-base leading-relaxed text-[#233a59] md:mb-7 md:max-w-[520px] md:text-lg">{slide.text}</p>
+      <ButtonLink href={slide.cta.href} class="max-xs:px-4 max-xs:text-sm">
+        {slide.cta.label}
+        <Icon name="arrow-right" class="size-[19px]" />
+      </ButtonLink>
+    </div>
+
+    <div aria-hidden="true" class="relative h-[280px] min-h-[280px] md:h-full md:min-h-[480px]">
+      {art.kind === 'product' && (
+        <>
+          <div class="absolute top-2.5 left-[15px] size-[65px] rounded-full border-2 border-pg-blue/20 md:top-[70px] md:left-0"></div>
+          <div class="absolute top-[30px] left-[70px] size-[30px] rounded-full border-2 border-pg-blue/20 bg-white/50"></div>
+          <div class="absolute -right-[25px] bottom-0 size-[230px] overflow-hidden rounded-full border-[6px] border-white/65 md:right-2.5 md:bottom-[5px] md:h-[350px] md:w-[300px] md:border-[10px] desk:size-[390px]">
+            <img src={art.photo} alt="" class="h-full w-full object-cover" {...imgLoading} />
+          </div>
+          <img
+            src={art.product}
+            alt=""
+            class="absolute bottom-0 left-0.5 z-[2] h-[250px] w-[145px] -rotate-4 object-contain mix-blend-multiply drop-shadow-[0_20px_22px_rgba(5,28,72,0.15)] md:bottom-1 md:-left-2.5 md:h-[390px] md:w-[210px] desk:left-5 desk:w-[265px]"
+            {...imgLoading}
+          />
+          <div class="absolute top-0 right-0 z-[3] flex size-20 rotate-8 flex-col items-center justify-center rounded-full bg-yellow text-center text-[10px] leading-[1.2] font-extrabold md:top-[65px] md:size-[105px] md:text-[13px]">
+            <Icon name="sparkles" class="mb-[5px] hidden size-5 md:block" />
+            <span class="max-w-[9ch]">{art.seal}</span>
+          </div>
+        </>
+      )}
+      {art.kind === 'cutout' && (
+        <>
+          <img src={art.photo} alt="" class={wide} {...imgLoading} />
+          <img
+            src={art.cutout}
+            alt=""
+            loading="lazy"
+            class="absolute bottom-[5px] -left-2.5 size-[110px] rotate-12 object-contain drop-shadow-[0_12px_20px_rgba(5,28,72,0.2)] md:-left-[15px] md:size-[190px]"
+          />
+        </>
+      )}
+      {art.kind === 'sale' && (
+        <>
+          <img src={art.photo} alt="" class={wide} {...imgLoading} />
+          <span class="absolute top-0 -right-[5px] grid size-[100px] rotate-8 place-content-center rounded-full bg-orange text-center text-xs leading-[1.1] font-bold text-white md:top-[25px] md:size-[140px] md:text-base">
+            Hasta<br /><strong class="font-display text-[28px] md:text-[37px]">{art.sale}</strong><br />de dcto.
+          </span>
+        </>
+      )}
+    </div>
+  </div>
+</div>
