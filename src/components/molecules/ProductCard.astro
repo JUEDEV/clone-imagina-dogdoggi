@@ -30,12 +30,12 @@ const imageHeights = {
 <article
   data-kind={product.kind}
   class={cn(
-    'group/card relative min-w-0 overflow-hidden rounded-[18px] border border-line bg-paper text-navy transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(5,28,72,0.1)]',
+    'group/card relative flex min-w-0 flex-col overflow-hidden rounded-[18px] border border-line bg-paper text-navy transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(5,28,72,0.1)]',
     feature && 'desk:grid desk:min-h-[245px] desk:grid-cols-[44%_1fr]',
     className,
   )}
 >
-  <div class:list={['relative overflow-hidden bg-surface', imageHeights[variant]]}>
+  <div class:list={['relative shrink-0 overflow-hidden bg-surface', imageHeights[variant]]}>
     {product.tag && (
       <span class={cn('absolute top-3 left-3 z-[2] max-w-[100px] rounded-md px-[9px] py-1 text-[10px] font-extrabold md:max-w-none', tagClass)}>
         {product.tag}
@@ -60,7 +60,7 @@ const imageHeights = {
       class="h-full w-full object-contain mix-blend-multiply transition-transform duration-300 ease-out group-hover/card:scale-105"
     />
   </div>
-  <div class:list={[small ? 'p-[13px] md:p-[18px]' : 'p-[18px]', feature && 'desk:p-5']}>
+  <div class:list={['flex flex-1 flex-col', small ? 'p-[13px] md:p-[18px]' : 'p-[18px]', feature && 'desk:p-5']}>
     <p class="mb-1 text-[10px] font-extrabold tracking-[0.08em] text-ink-soft uppercase">{product.category}</p>
     <h3
       class:list={[
@@ -78,12 +78,12 @@ const imageHeights = {
     <button
       type="button"
       class:list={[
-        'flex min-h-11 w-full items-center justify-center gap-2 rounded-[10px] border-[1.5px] border-orange px-2 font-extrabold text-[#b83f00] transition-colors duration-200 hover:bg-orange hover:text-white',
+        'mt-auto flex min-h-11 w-full items-center justify-center gap-2 rounded-[10px] border-[1.5px] border-orange px-2 font-extrabold text-[#b83f00] transition-colors duration-200 hover:bg-orange hover:text-white',
         small ? 'text-[11px] md:text-[13px]' : 'text-[13px]',
         feature && 'desk:text-xs',
       ]}
     >
-      <Icon name="shopping-bag" class="size-[17px]" />
+      <Icon name="shopping-bag" class:list={["size-[17px] shrink-0", small && "max-xs:hidden"]} />
       Agregar al carrito
     </button>
   </div>

@@ -23,10 +23,10 @@ const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
     </Reveal>
 
     <Reveal delay={120} class="group/filters">
-      <fieldset class="scrollbar-none mb-7 flex gap-2 overflow-x-auto pb-[3px] md:overflow-visible md:pb-0">
+      <fieldset class="scrollbar-none mb-7 flex min-w-0 gap-2 overflow-x-auto pb-[3px] md:overflow-visible md:pb-0">
         <legend class="sr-only">Filtrar productos</legend>
         {FILTERS.map((filter, i) => (
-          <span class="shrink-0">
+          <span class="relative shrink-0">
             <input type="radio" name="filtro-destacados" id={filter.id} class="peer sr-only" checked={i === 0} />
             <label
               for={filter.id}
@@ -41,9 +41,9 @@ const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
       <div class="relative">
         <div
           data-featured-track
-          class="scrollbar-none grid auto-cols-[76%] grid-flow-col gap-3 overflow-x-auto px-0.5 pt-1 pb-5 snap-x snap-mandatory md:auto-cols-[calc((100%-48px)/4)] md:gap-4 group-has-[#filtro-herramientas:checked]/filters:[&_[data-kind]:not([data-kind=herramientas])]:hidden group-has-[#filtro-cosmetica:checked]/filters:[&_[data-kind]:not([data-kind=cosmetica])]:hidden group-has-[#filtro-equipamiento:checked]/filters:[&_[data-kind]:not([data-kind=equipamiento])]:hidden"
+          class="scrollbar-none grid auto-cols-[calc((100%-12px)/2)] md:cursor-grab grid-flow-col gap-3 overflow-x-auto px-0.5 pt-1 pb-5 snap-x snap-mandatory md:auto-cols-[calc((100%-48px)/4)] md:gap-4 group-has-[#filtro-herramientas:checked]/filters:[&_[data-kind]:not([data-kind=herramientas])]:hidden group-has-[#filtro-cosmetica:checked]/filters:[&_[data-kind]:not([data-kind=cosmetica])]:hidden group-has-[#filtro-equipamiento:checked]/filters:[&_[data-kind]:not([data-kind=equipamiento])]:hidden"
         >
-          {PRODUCTS.map((product) => <ProductCard product={product} class="snap-start" />)}
+          {PRODUCTS.map((product) => <ProductCard product={product} variant="compact" class="snap-start" />)}
         </div>
         {([
           { dir: -1, icon: 'chevron-left', label: 'Productos anteriores', side: '-left-3 desk:-left-6' },
@@ -91,6 +91,68 @@ const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
         track.scrollBy({ left: Number(arrow.dataset.featuredArrow) * step, behavior: 'smooth' })
       })
     })
+
+    // Arrastre con mouse (en táctil ya lo hace el scroll nativo). Mientras se
+    // arrastra se apaga el snap; al soltar se encaja en la tarjeta más cercana.
+    const stepSize = () => {
+      const card = [...track.querySelectorAll<HTMLElement>('[data-kind]')].find((el) => el.offsetWidth > 0)
+      return (card?.offsetWidth ?? track.clientWidth) + parseFloat(getComputedStyle(track).columnGap || '0')
+    }
+    let startX = 0
+    let startScroll = 0
+    let pressed = false
+    let dragging = false
+
+    track.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'mouse' || event.button !== 0) return
+      pressed = true
+      dragging = false
+      startX = event.clientX
+      startScroll = track.scrollLeft
+    })
+
+    track.addEventListener('pointermove', (event) => {
+      if (!pressed) return
+      const dx = event.clientX - startX
+      if (!dragging && Math.abs(dx) > 5) {
+        dragging = true
+        track.setPointerCapture(event.pointerId)
+        track.style.scrollSnapType = 'none'
+        track.style.cursor = 'grabbing'
+        track.style.userSelect = 'none'
+      }
+      if (dragging) track.scrollLeft = startScroll - dx
+    })
+
+    const release = () => {
+      if (!pressed) return
+      pressed = false
+      if (!dragging) return
+      track.style.cursor = ''
+      track.style.userSelect = ''
+      const step = stepSize()
+      track.scrollTo({ left: Math.round(track.scrollLeft / step) * step, behavior: 'smooth' })
+      // Se devuelve el snap cuando termina la animación de encaje.
+      const restore = () => (track.style.scrollSnapType = '')
+      if ('onscrollend' in window) track.addEventListener('scrollend', restore, { once: true })
+      else setTimeout(restore, 400)
+    }
+    track.addEventListener('pointerup', release)
+    track.addEventListener('pointercancel', release)
+
+    // Tras arrastrar, el clic al soltar no debe abrir el producto.
+    track.addEventListener(
+      'click',
+      (event) => {
+        if (!dragging) return
+        event.preventDefault()
+        event.stopPropagation()
+        dragging = false
+      },
+      true,
+    )
+    // Evita el "arrastrar imagen/enlace" nativo del navegador.
+    track.addEventListener('dragstart', (event) => event.preventDefault())
 
     track.addEventListener('scroll', update, { passive: true })
     document.querySelectorAll('input[name="filtro-destacados"]').forEach((input) =>

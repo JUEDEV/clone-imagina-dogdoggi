@@ -67,13 +67,13 @@ export interface Category {
 }
 
 export const CATEGORIES: Category[] = [
-  { name: 'Cosmética', note: 'Cuidado del pelaje', image: '/images/products/perfect-groom-shampoo.jpeg', href: '#perfect-groom' },
-  { name: 'Cuchillas', note: 'Cortes precisos', image: '/images/products/herramientas-acabado.png', href: '#destacados' },
-  { name: 'Tijeras', note: 'Rectas y curvas', image: '/images/products/kit-tijeras.png', href: '#destacados' },
+  { name: 'Cosmética', note: 'Cuidado del pelaje', image: '/images/products/perfect-groom-shampoo.jpeg', href: '#perfect-groom', photo: true },
+  { name: 'Cuchillas', note: 'Cortes precisos', image: '/images/products/herramientas-acabado.png', href: '#destacados', photo: true },
+  { name: 'Tijeras', note: 'Rectas y curvas', image: '/images/products/kit-tijeras.png', href: '#destacados', photo: true },
   { name: 'Secadores y sopladores', note: 'Potencia profesional', image: '/images/photos/sesion-secado.webp', href: '#destacados', photo: true },
   { name: 'Mesas y equipamiento', note: 'Tu espacio de trabajo', image: '/images/photos/puesto-trabajo.webp', href: '#destacados', photo: true },
-  { name: 'Cepillería', note: 'Desenredo y acabado', image: '/images/products/set-cepilleria.png', href: '#destacados' },
-  { name: 'Repuestos', note: 'Compatibilidad y medidas', image: '/images/products/tijera-curva.png', href: '#destacados' },
+  { name: 'Cepillería', note: 'Desenredo y acabado', image: '/images/products/set-cepilleria.png', href: '#destacados', photo: true },
+  { name: 'Repuestos', note: 'Compatibilidad y medidas', image: '/images/products/tijera-curva.png', href: '#destacados', photo: true },
   { name: 'Ofertas', note: 'Oportunidades del mes', image: '/images/photos/peluquero-corte.webp', href: '#ofertas', photo: true },
 ]
 
