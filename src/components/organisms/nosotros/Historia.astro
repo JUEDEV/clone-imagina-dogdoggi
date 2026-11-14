@@ -1,0 +1,59 @@
+---
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import Reveal from '@/components/atoms/Reveal.astro'
+import { MILESTONES } from '@/data/nosotros'
+---
+
+<section class="py-16 md:py-24">
+  <Reveal class="shell grid items-center gap-[42px] md:grid-cols-[1.03fr_0.97fr] md:gap-[45px] desk:gap-20">
+    <div class="relative pb-[25px] pl-5 md:pb-[34px] md:pl-[34px]">
+      {/* Forma turquesa detrás de la foto. */}
+      <span class="absolute bottom-0 left-0 h-[72%] w-[74%] rounded-[28px_70px_28px_28px] bg-turquoise" aria-hidden="true"></span>
+      {/* TODO: reemplazar por una foto del equipo Dog Doggi (la plantilla la marca como provisional). */}
+      <img
+        src="/images/photos/puesto-trabajo.webp"
+        alt="Peluquera trabajando con un perro en su espacio de peluquería"
+        width="900"
+        height="450"
+        loading="lazy"
+        class="relative aspect-[1/0.9] w-full rounded-[18px_45px_18px_18px] object-cover md:aspect-[1/0.96] md:rounded-[24px_70px_24px_24px]"
+      />
+      <div
+        class="absolute right-[-4px] bottom-0 z-[2] flex items-center gap-3 rounded-2xl bg-navy px-[15px] py-[13px] text-white shadow-[0_15px_35px_rgba(5,28,72,0.18)] md:right-[-10px] md:px-[22px] md:py-[18px] desk:right-[-25px]"
+      >
+        <Icon name="heart-handshake" class="size-6 text-turquoise" />
+        <strong class="font-display text-[13px] leading-[1.3] font-medium md:text-[15px]">Hecho para quienes<br />trabajan con cariño</strong>
+      </div>
+    </div>
+
+    <div>
+      <Eyebrow class="mb-[13px] text-turquoise-dark">Nuestra historia</Eyebrow>
+      <h2 class="mb-[22px] text-[34px] leading-[1.1] font-semibold tracking-[-0.025em] md:text-[clamp(34px,3.4vw,48px)]">
+        Una tienda que entiende tu día a día
+      </h2>
+      <div class="space-y-4 text-base leading-[1.75] text-ink-soft md:text-[17px]">
+        <p>
+          En Dog Doggi reunimos herramientas, equipos, repuestos y productos para peluqueros caninos profesionales. Queremos que
+          encuentres lo que necesitas de forma clara, sin dar vueltas y con apoyo cuando tengas una duda.
+        </p>
+        <p>
+          También somos la casa de Perfect Groom, nuestra línea exclusiva de cosmética canina. Es una parte especial de lo que hacemos
+          y convive con una selección amplia de herramientas para tu rutina profesional.
+        </p>
+      </div>
+      <ol class="mt-7 grid grid-cols-3 border-t border-line pt-[25px] md:mt-[30px]" aria-label="Línea de tiempo">
+        {MILESTONES.map((milestone) => (
+          <li class="relative pt-3.5 pr-2 md:pr-[15px]">
+            <span
+              class="absolute -top-[30px] left-0 size-[9px] rounded-full bg-orange shadow-[0_0_0_5px_var(--color-paper)]"
+              aria-hidden="true"
+            ></span>
+            <span class="block text-[11px] font-extrabold tracking-[0.08em] text-orange-dark">{milestone.year}</span>
+            <strong class="mt-1 block font-display text-base font-medium">{milestone.event}</strong>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </Reveal>
+</section>

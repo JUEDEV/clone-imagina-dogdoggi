@@ -1,0 +1,185 @@
+---
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import FormField from '@/components/molecules/FormField.astro'
+import { CONTACT_TOPICS, PRIVACY_POLICY_URL } from '@/data/contacto'
+import { WHATSAPP_URL } from '@/data/site'
+
+// Formulario de contacto. Validación y envío con un <script> corto (sin isla):
+// solo hay que leer campos, pintar errores y hacer un fetch a /api/contacto.
+---
+
+<div class="rounded-[18px] border border-line bg-paper px-5 py-[25px] shadow-[0_16px_45px_rgba(5,28,72,0.055)] md:rounded-3xl md:p-[30px] desk:p-[42px]">
+  <div class="mb-[25px] md:mb-8">
+    <Eyebrow class="mb-[13px] text-turquoise-dark">Cuéntanos</Eyebrow>
+    <h2 id="contact-form-title" class="mb-2.5 text-[31px] leading-[1.12] font-semibold tracking-[-0.02em] md:text-[clamp(30px,3vw,40px)]">
+      ¿Cómo podemos ayudarte?
+    </h2>
+    <p class="max-w-[620px] text-[15px] text-ink-soft">
+      Completa el formulario y te responderemos por el canal que nos indiques. Los campos con * son obligatorios.
+    </p>
+  </div>
+
+  <form class="group/form relative" novalidate data-contact-form aria-labelledby="contact-form-title">
+    <div class="grid desk:grid-cols-2 desk:gap-[18px]">
+      <FormField id="contact-name" label="Nombre completo" required>
+        <input id="contact-name" name="name" type="text" autocomplete="name" required aria-describedby="contact-name-error" placeholder="Tu nombre y apellido" class="form-control" />
+      </FormField>
+      <FormField id="contact-email" label="Correo electrónico" required>
+        <input id="contact-email" name="email" type="email" inputmode="email" autocomplete="email" required aria-describedby="contact-email-error" placeholder="tu@correo.com" class="form-control" />
+      </FormField>
+    </div>
+    <div class="grid desk:grid-cols-2 desk:gap-[18px]">
+      <FormField id="contact-phone" label="Teléfono o WhatsApp" required>
+        <input id="contact-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required aria-describedby="contact-phone-error" placeholder="Ej. 300 000 0000" class="form-control" />
+      </FormField>
+      <FormField id="contact-city" label="Ciudad">
+        <input id="contact-city" name="city" type="text" autocomplete="address-level2" placeholder="¿Desde dónde nos escribes?" class="form-control" />
+      </FormField>
+    </div>
+    <FormField id="contact-topic" label="Tipo de consulta">
+      <select id="contact-topic" name="topic" class="form-control">
+        {CONTACT_TOPICS.map((topic) => <option>{topic}</option>)}
+      </select>
+    </FormField>
+    <FormField id="contact-message" label="Mensaje" required>
+      <textarea
+        id="contact-message"
+        name="message"
+        rows="5"
+        required
+        aria-describedby="contact-message-error"
+        placeholder="Escribe tu consulta y, si la tienes, la referencia del producto…"
+        class="form-control min-h-[142px] resize-y leading-normal"></textarea>
+    </FormField>
+
+    {/* Honeypot: invisible para personas; si llega lleno, el servidor lo descarta. */}
+    <div class="absolute -left-[10000px] size-px overflow-hidden" aria-hidden="true">
+      <label for="contact-website">No completes este campo</label>
+      <input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+    </div>
+
+    <div class="mt-0.5 mb-6" data-field>
+      <label class="flex cursor-pointer items-start gap-[11px] text-sm leading-normal">
+        <input name="privacy" type="checkbox" required aria-describedby="contact-privacy-error" class="m-0 size-[22px] shrink-0 cursor-pointer accent-turquoise-dark" />
+        <span>
+          <a href={PRIVACY_POLICY_URL} class="underline decoration-1 underline-offset-3 hover:text-orange-dark">
+            Acepto la política de tratamiento de datos personales
+          </a>
+          <b aria-hidden="true" class="text-orange-dark">*</b>
+        </span>
+      </label>
+      <span id="contact-privacy-error" class="mt-1.5 ml-[33px] block text-[13px] leading-[1.4] font-bold text-[#a21b13] empty:hidden" role="alert"></span>
+    </div>
+
+    <button
+      type="submit"
+      class="inline-flex min-h-[54px] w-full items-center justify-center gap-3 rounded-[13px] bg-orange px-[22px] py-3 font-extrabold text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-orange-dark disabled:cursor-wait disabled:opacity-80 disabled:hover:translate-y-0 md:min-h-[50px] md:w-auto md:min-w-[205px]"
+    >
+      <span class="inline-flex items-center gap-3 group-data-[state=sending]/form:hidden">
+        Enviar mensaje
+        <Icon name="send" class="size-[18px]" />
+      </span>
+      <span class="hidden items-center gap-3 group-data-[state=sending]/form:inline-flex">
+        <Icon name="loader-circle" class="size-[19px] animate-spin motion-reduce:animate-none" />
+        Enviando…
+      </span>
+    </button>
+
+    <div aria-live="polite" aria-atomic="true">
+      <p
+        class="mt-5 hidden items-start gap-2.5 rounded-[11px] border border-[#b7e4c8] bg-[#e8f8ef] px-[17px] py-[15px] text-sm leading-normal text-[#155b3a] group-data-[state=success]/form:flex"
+      >
+        <Icon name="circle-check" class="mt-px size-[21px] shrink-0" />
+        <span><strong class="block text-[#104d31]">¡Gracias por escribirnos!</strong> Recibimos tu mensaje y te responderemos pronto.</span>
+      </p>
+      <p
+        class="mt-5 hidden rounded-[11px] border border-[#f0c3bd] bg-[#fff0ee] px-[17px] py-[15px] text-sm leading-normal text-[#8d2018] group-data-[state=error]/form:block"
+      >
+        <strong>No pudimos enviar tu mensaje.</strong> Inténtalo de nuevo en unos minutos o
+        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" class="font-extrabold underline">escríbenos por WhatsApp</a>.
+      </p>
+    </div>
+  </form>
+</div>
+
+<script>
+  type Errors = Record<string, string>
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  // Mismos mensajes que valida el servidor (lib/forms/contact.ts).
+  function validate(data: Record<string, unknown>): Errors {
+    const value = (key: string) => String(data[key] ?? '').trim()
+    const errors: Errors = {}
+    if (value('name').length < 3) errors.name = 'Escribe tu nombre completo.'
+    if (!EMAIL_RE.test(value('email'))) errors.email = 'Escribe un correo electrónico válido.'
+    if (value('phone').replace(/\D/g, '').length < 7) errors.phone = 'Escribe un teléfono o WhatsApp válido.'
+    if (value('message').length < 10) errors.message = 'Cuéntanos un poco más; el mensaje debe tener al menos 10 caracteres.'
+    if (data.privacy !== true) errors.privacy = 'Debes aceptar la política para enviar el mensaje.'
+    return errors
+  }
+
+  for (const form of document.querySelectorAll<HTMLFormElement>('[data-contact-form]')) {
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!
+
+    const setFieldError = (name: string, message = '') => {
+      const control = form.elements.namedItem(name) as HTMLInputElement | null
+      if (!control) return
+      const error = document.getElementById(control.getAttribute('aria-describedby') ?? '')
+      if (error) error.textContent = message
+      control.closest('[data-field]')?.toggleAttribute('data-invalid', Boolean(message))
+      control.setAttribute('aria-invalid', String(Boolean(message)))
+    }
+
+    const showErrors = (errors: Errors) => {
+      for (const name of ['name', 'email', 'phone', 'message', 'privacy']) setFieldError(name, errors[name])
+      const first = Object.keys(errors)[0]
+      if (first) (form.elements.namedItem(first) as HTMLElement | null)?.focus()
+    }
+
+    // Al corregir un campo se borra su error y el mensaje de resultado anterior.
+    form.addEventListener('input', (event) => {
+      const target = event.target as HTMLInputElement
+      if (target.name) setFieldError(target.name)
+      if (form.dataset.state !== 'sending') delete form.dataset.state
+    })
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault()
+      if (form.dataset.state === 'sending') return
+
+      const data: Record<string, unknown> = Object.fromEntries(new FormData(form))
+      data.privacy = (form.elements.namedItem('privacy') as HTMLInputElement).checked
+
+      const errors = validate(data)
+      if (Object.keys(errors).length) {
+        delete form.dataset.state
+        showErrors(errors)
+        return
+      }
+
+      form.dataset.state = 'sending'
+      button.disabled = true
+      try {
+        const response = await fetch('/api/contacto', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        })
+        if (response.status === 422) {
+          delete form.dataset.state
+          showErrors(((await response.json()) as { errors: Errors }).errors)
+          return
+        }
+        if (!response.ok) throw new Error(String(response.status))
+        form.reset()
+        form.dataset.state = 'success'
+      } catch {
+        form.dataset.state = 'error'
+      } finally {
+        button.disabled = false
+      }
+    })
+  }
+</script>

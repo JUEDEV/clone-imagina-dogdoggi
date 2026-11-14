@@ -1,0 +1,34 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import PageHero from '@/components/organisms/PageHero.astro'
+import Sedes from '@/components/organisms/Sedes.astro'
+import Historia from '@/components/organisms/nosotros/Historia.astro'
+import QueHacemos from '@/components/organisms/nosotros/QueHacemos.astro'
+import CtaEquipar from '@/components/organisms/nosotros/CtaEquipar.astro'
+import { breadcrumbJsonLd, buildTitle, type Crumb } from '@/lib/seo'
+
+export const prerender = true
+
+const crumbs: Crumb[] = [{ label: 'Inicio', href: '/' }, { label: 'Nosotros' }]
+const description =
+  'Acompañamos a los peluqueros caninos con productos, herramientas y asesoría para que equipes tu trabajo con confianza.'
+---
+
+<Layout
+  title={buildTitle('Nosotros')}
+  description={description}
+  image="/images/photos/puesto-trabajo.webp"
+  jsonLd={breadcrumbJsonLd(crumbs, Astro.site, Astro.url.pathname)}
+>
+  <main id="main-content">
+    <PageHero crumbs={crumbs} support={description} layout="split">
+      <Eyebrow slot="meta" class="text-turquoise-dark">Cerca de tu trabajo, cerca de ti</Eyebrow>
+      Somos Dog Doggi
+    </PageHero>
+    <Historia />
+    <QueHacemos />
+    <Sedes />
+    <CtaEquipar />
+  </main>
+</Layout>

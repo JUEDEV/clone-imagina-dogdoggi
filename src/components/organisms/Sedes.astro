@@ -1,0 +1,74 @@
+---
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import Reveal from '@/components/atoms/Reveal.astro'
+import LocationCard from '@/components/molecules/LocationCard.astro'
+import { LOCATION_DETAILS } from '@/data/nosotros'
+import { CONTACT_SCHEDULE, LOCATIONS } from '@/data/site'
+
+// Sedes (Nosotros y Contacto). En `contact`, en móvil se ve una sede a la vez
+// con pestañas: son radios nativos (flechas del teclado incluidas) y el CSS
+// muestra la tarjeta cuyo radio está marcado. Sin JS.
+interface Props {
+  variant?: 'about' | 'contact'
+  text?: string
+  class?: string
+}
+
+const {
+  variant = 'about',
+  text = 'Dos puntos para acercarte, preguntar y encontrar lo que necesita tu peluquería.',
+  class: className = 'py-16 md:py-24',
+} = Astro.props
+const contact = variant === 'contact'
+
+// Una regla por sede: Tailwind no ve clases armadas en tiempo de ejecución.
+const tabsCss = LOCATIONS.map(
+  (_, i) => `#sedes:has(#sede-${i}:checked) [data-sede="${i}"]{display:block;animation:sede-in .25s ease-out}`,
+).join('')
+---
+
+<section id="sedes" class:list={['bg-paper', className]} aria-labelledby="sedes-title">
+  <div class="shell">
+    <Reveal class="mb-[35px] grid gap-3.5 md:grid-cols-2 md:items-end md:gap-10">
+      <div>
+        <Eyebrow class="mb-[13px] text-turquoise-dark">Ven y salúdanos</Eyebrow>
+        <h2 id="sedes-title" class="text-[34px] leading-[1.1] font-semibold tracking-[-0.025em] md:text-[clamp(34px,3.4vw,48px)]">
+          Nuestras sedes
+        </h2>
+      </div>
+      <p class="max-w-[470px] text-base text-ink-soft md:text-[17px]">{text}</p>
+    </Reveal>
+
+    {contact && (
+      <fieldset class="mb-4 grid grid-cols-2 gap-[5px] rounded-[13px] bg-[#e9f2f3] p-[5px] md:hidden">
+        <legend class="sr-only">Selecciona una sede</legend>
+        {LOCATIONS.map((location, i) => (
+          <label class="grid min-h-12 cursor-pointer place-items-center rounded-[9px] text-sm font-extrabold transition-colors has-checked:bg-navy has-checked:text-white has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-navy">
+            <input type="radio" name="sede" id={`sede-${i}`} class="sr-only" checked={i === 0} />
+            {location.city}
+          </label>
+        ))}
+      </fieldset>
+    )}
+
+    <div class="grid gap-[22px] md:grid-cols-2">
+      {LOCATIONS.map((location, i) => (
+        <div data-sede={i} class:list={[contact && 'max-md:hidden']}>
+          <Reveal delay={i * 100} class="h-full">
+            <LocationCard
+              location={location}
+              index={i}
+              variant={variant}
+              detail={LOCATION_DETAILS[location.city]}
+              schedule={CONTACT_SCHEDULE}
+            />
+          </Reveal>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+{contact && (
+  <style is:inline set:html={`@keyframes sede-in{from{opacity:.75;transform:translateY(7px)}to{opacity:1;transform:none}}@media (max-width:47.99rem){${tabsCss}}`}></style>
+)}

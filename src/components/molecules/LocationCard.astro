@@ -1,0 +1,83 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import { mapsUrl, type Location } from '@/data/site'
+
+// Tarjeta de sede con mapa ilustrado (solo CSS, sin cargar Google Maps).
+// `about`: texto descriptivo y enlace a /contacto. `contact`: horario y botón "Cómo llegar".
+interface Props {
+  location: Location
+  /** Posición en la lista: alterna el color del mapa. */
+  index: number
+  variant?: 'about' | 'contact'
+  detail?: string
+  /** Horario de atención (variante `contact`). */
+  schedule?: string
+  class?: string
+}
+
+const { location, index, variant = 'about', detail, schedule, class: className } = Astro.props
+const contact = variant === 'contact'
+const mapBg = index % 2 === 0 ? 'bg-[#d9f3f1]' : 'bg-[#fff0e3]'
+---
+
+<article
+  class:list={[
+    'grid h-full overflow-hidden rounded-[22px] border border-line bg-paper',
+    contact
+      ? 'grid-cols-1 md:min-h-[330px] md:grid-cols-[33%_67%] desk:grid-cols-[39%_61%]'
+      : 'min-h-[270px] grid-cols-1 xs:grid-cols-[34%_66%] md:min-h-[300px] md:grid-cols-[36%_64%] desk:grid-cols-[42%_58%]',
+    className,
+  ]}
+>
+  <div
+    class:list={['relative grid place-items-center overflow-hidden', mapBg, contact ? 'min-h-[155px] md:min-h-0' : 'min-h-[120px] xs:min-h-0']}
+    aria-hidden="true"
+  >
+    {/* Calles del mapa ilustrado. */}
+    <span class="absolute h-7 w-[190%] -rotate-[35deg] bg-paper/85"></span>
+    <span class="absolute h-[18px] w-[190%] rotate-[55deg] bg-paper/85"></span>
+    <span class="absolute h-[190%] w-7 rotate-12 bg-paper/70"></span>
+    <span class="absolute h-[190%] w-3.5 rotate-[80deg] bg-paper/70"></span>
+    <span class="relative z-[2] grid size-[54px] place-items-center rounded-full bg-orange text-white shadow-[0_8px_20px_rgba(5,28,72,0.16)]">
+      <Icon name="map-pin" class="size-7" />
+    </span>
+  </div>
+
+  <div class:list={[contact ? 'px-[23px] py-[26px] md:px-[23px] md:py-7 desk:px-[30px] desk:py-[34px]' : 'p-6 xs:px-5 xs:py-[25px] md:px-[30px] md:py-[35px]']}>
+    <span class="text-[10px] font-extrabold tracking-[0.12em] text-turquoise-dark uppercase">
+      {contact ? `Sede ${location.city}` : 'Sede'}
+    </span>
+    <h3 class:list={['mt-1.5 mb-2 leading-none', contact ? 'text-[34px]' : 'text-[28px] md:text-[32px]']}>{location.city}</h3>
+    <address class:list={['font-extrabold not-italic', contact ? 'text-base leading-normal md:min-h-[54px]' : 'text-[15px] md:text-[17px]']}>
+      {location.address}
+    </address>
+
+    {contact ? (
+      <>
+        {schedule && (
+          <p class="mt-3.5 mb-5 flex items-start gap-[7px] text-[13px] text-ink-soft">
+            <Icon name="clock" class="mt-0.5 size-[17px] shrink-0 text-turquoise-dark" />
+            {schedule}
+          </p>
+        )}
+        <a
+          href={mapsUrl(location)}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex min-h-12 w-full items-center justify-center gap-3 rounded-[13px] border-2 border-navy px-[18px] py-2.5 text-sm font-extrabold text-navy transition-colors hover:bg-navy hover:text-white md:w-auto"
+        >
+          Cómo llegar
+          <Icon name="arrow-right" class="size-[18px]" />
+        </a>
+      </>
+    ) : (
+      <>
+        {detail && <p class="my-[15px] text-sm text-ink-soft">{detail}</p>}
+        <a href="/contacto" class="inline-flex min-h-11 items-center gap-[7px] text-sm font-extrabold text-orange-dark hover:underline">
+          Ver cómo llegar
+          <Icon name="arrow-up-right" class="size-[18px]" />
+        </a>
+      </>
+    )}
+  </div>
+</article>

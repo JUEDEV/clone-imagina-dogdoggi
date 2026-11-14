@@ -1,0 +1,44 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import PageHero from '@/components/organisms/PageHero.astro'
+import Sedes from '@/components/organisms/Sedes.astro'
+import ContactoMain from '@/components/organisms/contacto/ContactoMain.astro'
+import { LOCATIONS, SOCIAL, WHATSAPP_NUMBER } from '@/data/site'
+import { breadcrumbJsonLd, buildTitle, SITE_NAME, type Crumb } from '@/lib/seo'
+
+export const prerender = true
+
+const crumbs: Crumb[] = [{ label: 'Inicio', href: '/' }, { label: 'Contacto' }]
+const description = 'Escríbenos, visítanos o resuelve tus dudas. Estamos para ayudarte.'
+
+// Cada sede como tienda física, además de la ruta de navegación.
+const stores = LOCATIONS.map((location) => ({
+  '@context': 'https://schema.org',
+  '@type': 'PetStore',
+  name: `${SITE_NAME} ${location.city}`,
+  telephone: `+${WHATSAPP_NUMBER}`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: location.address,
+    addressLocality: location.city,
+    addressCountry: 'CO',
+  },
+  sameAs: SOCIAL.map((social) => social.href),
+}))
+---
+
+<Layout
+  title={buildTitle('Contacto')}
+  description={description}
+  jsonLd={[breadcrumbJsonLd(crumbs, Astro.site, Astro.url.pathname), ...stores]}
+>
+  <main id="main-content">
+    <PageHero crumbs={crumbs} support={description} layout="split">
+      <Eyebrow slot="meta" class="text-turquoise-dark">Hablemos</Eyebrow>
+      Contáctanos
+    </PageHero>
+    <ContactoMain />
+    <Sedes variant="contact" text="Encuentra la sede más cercana y planea tu visita." class="pt-[55px] pb-16 md:py-24" />
+  </main>
+</Layout>

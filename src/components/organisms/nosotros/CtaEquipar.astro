@@ -1,0 +1,28 @@
+---
+import ButtonLink from '@/components/atoms/ButtonLink.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import Reveal from '@/components/atoms/Reveal.astro'
+import { WHATSAPP_URL } from '@/data/site'
+
+// Cierre turquesa de Nosotros (la plantilla lo distingue del CtaCierre navy del blog).
+---
+
+<section class="relative overflow-hidden bg-turquoise py-[45px] md:py-[55px]">
+  <Reveal class="shell relative z-[2] flex flex-col items-start gap-[25px] desk:flex-row desk:items-center desk:justify-between desk:gap-10">
+    <div>
+      <span class="mb-[7px] block text-xs font-extrabold text-[#073c52]">Tu próximo servicio empieza con buen equipo</span>
+      <h2 class="text-[30px] leading-[1.15] font-semibold md:text-[clamp(30px,3.3vw,44px)]">¿Listo para equipar tu peluquería?</h2>
+    </div>
+    <div class="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+      <ButtonLink href="/productos">
+        Ir a la tienda
+        <Icon name="arrow-right" class="size-[19px]" />
+      </ButtonLink>
+      <ButtonLink href={WHATSAPP_URL} external variant="outline" class="gap-[9px] px-5 text-sm">
+        <Icon name="whatsapp" class="size-[19px]" />
+        Escríbenos por WhatsApp
+      </ButtonLink>
+    </div>
+  </Reveal>
+  <Icon name="package-check" class="absolute -right-[35px] -bottom-[70px] size-[210px] -rotate-12 text-navy/8" />
+</section>

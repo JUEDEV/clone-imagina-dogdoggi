@@ -1,0 +1,13 @@
+---
+import ContactChannels from '@/components/organisms/contacto/ContactChannels.astro'
+import ContactForm from '@/components/organisms/contacto/ContactForm.astro'
+
+// Bloque principal de Contacto: formulario a la izquierda y canales a la derecha.
+---
+
+<section class="bg-[#f2f7f8] pt-[45px] pb-[55px] md:py-24">
+  <div class="shell grid items-start gap-0 md:grid-cols-[minmax(0,1fr)_310px] md:gap-5 desk:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.7fr)] desk:gap-7">
+    <ContactForm />
+    <ContactChannels />
+  </div>
+</section>

@@ -1,0 +1,23 @@
+---
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import Reveal from '@/components/atoms/Reveal.astro'
+import ServiceCard from '@/components/molecules/ServiceCard.astro'
+import { SERVICES } from '@/data/nosotros'
+---
+
+<section class="bg-[#f2f7f8] py-16 md:py-24">
+  <div class="shell">
+    <Reveal class="mb-[38px] max-w-[650px]">
+      <Eyebrow class="mb-[13px] text-turquoise-dark">Todo en un mismo lugar</Eyebrow>
+      <h2 class="mb-2.5 text-[34px] leading-[1.1] font-semibold tracking-[-0.025em] md:text-[clamp(34px,3.4vw,48px)]">¿Qué hacemos?</h2>
+      <p class="text-base text-ink-soft md:text-[17px]">Te ayudamos a equipar cada etapa de tu servicio profesional.</p>
+    </Reveal>
+    <div class="grid gap-3 md:grid-cols-2 md:gap-4 desk:grid-cols-4">
+      {SERVICES.map((service, i) => (
+        <Reveal delay={i * 80}>
+          <ServiceCard service={service} iconClass={i === 1 ? 'text-pg-ink' : undefined} />
+        </Reveal>
+      ))}
+    </div>
+  </div>
+</section>

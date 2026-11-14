@@ -1,0 +1,21 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import type { Service } from '@/data/nosotros'
+
+// Tarjeta de "¿Qué hacemos?": ícono turquesa, título y texto.
+interface Props {
+  service: Service
+  /** Color del ícono (la plantilla alterna turquesa y azul Perfect Groom). */
+  iconClass?: string
+}
+
+const { service, iconClass = 'text-turquoise-dark' } = Astro.props
+---
+
+<article
+  class="h-full rounded-[20px] border border-line bg-paper p-6 transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[0_14px_35px_rgba(5,28,72,0.08)] md:min-h-[235px] md:px-[25px] md:py-[30px] desk:min-h-[280px]"
+>
+  <Icon name={service.icon} strokeWidth={1.6} class:list={['mb-[18px] size-8 md:mb-[22px] md:size-[38px] desk:mb-[35px]', iconClass]} />
+  <h3 class="mb-3 text-[21px] leading-[1.2] font-medium">{service.title}</h3>
+  <p class="m-0 text-sm leading-[1.65] text-ink-soft">{service.text}</p>
+</article>

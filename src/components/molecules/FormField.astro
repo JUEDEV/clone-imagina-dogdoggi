@@ -1,0 +1,22 @@
+---
+// Campo del formulario: etiqueta, control (slot) y mensaje de error.
+// El control lleva `aria-describedby="<id>-error"`; el script del formulario
+// llena ese span y marca el contenedor con `data-invalid` para pintar el borde rojo.
+interface Props {
+  id: string
+  label: string
+  required?: boolean
+  class?: string
+}
+
+const { id, label, required = false, class: className } = Astro.props
+---
+
+<div class:list={['group/field mb-5', className]} data-field>
+  <label for={id} class="mb-[7px] block text-sm font-extrabold">
+    {label}
+    {required && <span aria-hidden="true" class="text-orange-dark">*</span>}
+  </label>
+  <slot />
+  <span id={`${id}-error`} class="mt-1.5 block text-[13px] leading-[1.4] font-bold text-[#a21b13] empty:hidden" role="alert"></span>
+</div>
