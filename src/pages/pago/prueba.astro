@@ -1,0 +1,48 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import { money } from '@/lib/money'
+import { isOrderReference } from '@/lib/orders/reference'
+import { getOrderRepository } from '@/lib/orders/repository'
+import { MOCK_STATUSES, buildMockTransactionId } from '@/lib/payments/mock'
+import { getPaymentMode } from '@/lib/payments/wompi'
+import { buildTitle } from '@/lib/seo'
+
+// Simulador de pasarela: solo existe sin llaves de Wompi y fuera de producción.
+export const prerender = false
+
+if (getPaymentMode() !== 'mock') return Astro.redirect('/')
+const reference = Astro.url.searchParams.get('ref') ?? ''
+const order = isOrderReference(reference) ? await getOrderRepository()?.findByReference(reference) : null
+if (!order) return Astro.redirect('/carrito')
+
+const LABELS = { APPROVED: 'Aprobar pago', DECLINED: 'Rechazar pago', PENDING: 'Dejar pendiente (PSE)' } as const
+---
+
+<Layout title={buildTitle('Pago de prueba')} noindex>
+  <main id="main-content" class="bg-[#f2f7f8] py-14 md:py-20">
+    <div class="shell max-w-[560px]">
+      <p class="rounded-2xl border border-[#f1d38a] bg-[#fff8e5] px-4 py-3 text-sm text-[#6b4d00]">
+        <strong>Modo de prueba.</strong> Esta pantalla reemplaza a Wompi mientras no haya llaves configuradas. No se cobra nada.
+      </p>
+      <div class="mt-5 rounded-[22px] border border-line bg-paper p-6">
+        <p class="text-sm text-ink-soft">Pedido</p>
+        <p class="font-extrabold">{order.reference}</p>
+        <p class="mt-4 text-sm text-ink-soft">Monto</p>
+        <p class="font-display text-4xl font-semibold">{money(order.total)}</p>
+        <div class="mt-6 grid gap-3">
+          {MOCK_STATUSES.map((status) => (
+            <a
+              href={`/pago/retorno?ref=${encodeURIComponent(order.reference)}&id=${encodeURIComponent(buildMockTransactionId(status, order.reference))}&env=mock`}
+              class:list={[
+                'flex min-h-12 items-center justify-center rounded-[13px] font-extrabold transition-colors',
+                status === 'APPROVED' ? 'bg-orange text-white hover:bg-orange-dark' : 'border-2 border-navy hover:bg-navy hover:text-white',
+              ]}
+            >
+              {LABELS[status]}
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

@@ -1,0 +1,22 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import CatalogHeader from '@/components/organisms/catalog/CatalogHeader.astro'
+import CartPage from '@/components/islands/CartPage'
+import { buildTitle } from '@/lib/seo'
+
+// El carrito vive en el navegador: la página es un cascarón estático y la isla lo pinta.
+export const prerender = true
+---
+
+<Layout title={buildTitle('Carrito')} noindex>
+  <main id="main-content">
+    <CatalogHeader crumbs={[{ label: 'Inicio', href: '/' }, { label: 'Carrito' }]} title="Tu carrito" />
+    <section class="bg-paper py-8 md:py-12">
+      <div class="shell">
+        <CartPage client:only="react">
+          <p slot="fallback" class="py-16 text-center text-ink-soft">Cargando tu carrito…</p>
+        </CartPage>
+      </div>
+    </section>
+  </main>
+</Layout>

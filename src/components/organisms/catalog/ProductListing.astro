@@ -1,0 +1,130 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import Pagination from '@/components/molecules/Pagination.astro'
+import ProductCard from '@/components/molecules/ProductCard.astro'
+import FiltersSidebar, { type CategoryLink } from '@/components/organisms/catalog/FiltersSidebar.astro'
+import { brandsOf, cardContext, type Catalog, type Product } from '@/lib/catalog'
+import {
+  HIGHLIGHTS,
+  PRICE_RANGES,
+  SORT_OPTIONS,
+  applyFilters,
+  listingUrl,
+  paginate,
+  sortProducts,
+  type ListingParams,
+} from '@/lib/catalog/listing'
+
+// Listado con filtros (Herbolario): barra lateral, orden, chips de filtros
+// activos, rejilla y paginación. Todo se resuelve en el servidor con la URL.
+// `products` llega ya acotado por categoría o búsqueda; aquí se aplican marca,
+// precio y destacados, y se ordena y pagina.
+interface Props {
+  catalog: Catalog
+  products: Product[]
+  url: URL
+  params: ListingParams
+  categories?: { title: string; links: CategoryLink[] }
+  /** Chips extra (búsqueda, categoría) que no maneja la barra lateral. */
+  extraChips?: { label: string; href: string }[]
+  clearHref: string
+  /** Mantener el orden de relevancia de la búsqueda. */
+  keepOrder?: boolean
+}
+
+const { catalog, products, url, params, categories, extraChips = [], clearHref, keepOrder = false } = Astro.props
+
+const brandCounts = brandsOf(products).map((name) => ({ name, count: products.filter((p) => p.brand === name).length }))
+const filtered = applyFilters(products, params)
+const sorted = keepOrder && !params.orden ? filtered : sortProducts(filtered, params.orden)
+const { items, page, pageCount, total } = paginate(sorted, params.page)
+
+const chips = [
+  ...extraChips,
+  ...params.marcas.map((m) => ({ label: m, href: listingUrl(url, { marca: params.marcas.filter((v) => v !== m) }) })),
+  ...params.precios.map((p) => ({
+    label: PRICE_RANGES.find((r) => r.value === p)?.label ?? p,
+    href: listingUrl(url, { precio: params.precios.filter((v) => v !== p) }),
+  })),
+  ...params.destacados.map((d) => ({
+    label: HIGHLIGHTS.find((h) => h.value === d)?.label ?? d,
+    href: listingUrl(url, { destacado: params.destacados.filter((v) => v !== d) }),
+  })),
+]
+// Campos ocultos para que el formulario de orden conserve los filtros.
+const hidden = [...url.searchParams.entries()].filter(([key]) => key !== 'orden' && key !== 'page')
+---
+
+<section class="bg-paper py-8 md:py-12">
+  <div class="shell grid items-start gap-6 md:grid-cols-[240px_1fr] desk:grid-cols-[260px_1fr] desk:gap-9">
+    <FiltersSidebar url={url} params={params} categories={categories} brands={brandCounts} clearHref={clearHref} />
+
+    <div class="min-w-0" data-listing>
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm font-bold text-ink-soft" aria-live="polite">
+          {total} {total === 1 ? 'producto' : 'productos'}
+        </p>
+        <form method="get" class="flex items-center gap-2" data-sort-form>
+          {hidden.map(([key, value]) => <input type="hidden" name={key} value={value} />)}
+          <label for="orden" class="text-sm font-bold">Ordenar:</label>
+          <select id="orden" name="orden" class="form-control min-h-11 w-auto py-2 pr-9 text-sm">
+            {SORT_OPTIONS.map((option) => (
+              <option value={option.value} selected={option.value === params.orden}>{option.label}</option>
+            ))}
+          </select>
+          <noscript><button type="submit" class="min-h-11 rounded-[11px] bg-navy px-4 text-sm font-extrabold text-white">Aplicar</button></noscript>
+        </form>
+      </div>
+
+      {chips.length > 0 && (
+        <ul class="mb-5 flex flex-wrap gap-2" aria-label="Filtros activos">
+          {chips.map((chip) => (
+            <li>
+              <a
+                href={chip.href}
+                class="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-mint py-1 pr-2.5 pl-3.5 text-[13px] font-bold transition-colors hover:bg-[#d4f0ef]"
+                rel="nofollow"
+              >
+                {chip.label}
+                <span class="sr-only">(quitar filtro)</span>
+                <span aria-hidden="true" class="text-base leading-none">×</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {items.length > 0 ? (
+        <div class="grid grid-cols-2 gap-2 xs:gap-3 desk:grid-cols-3 desk:gap-4 min-[1360px]:grid-cols-4">
+          {items.map((product) => <ProductCard product={product} {...cardContext(catalog, product)} />)}
+        </div>
+      ) : (
+        <div class="flex flex-col items-center gap-3 rounded-[22px] border border-dashed border-line px-6 py-16 text-center">
+          <span class="grid size-14 place-items-center rounded-full bg-mint text-turquoise-dark">
+            <Icon name="shopping-bag" class="size-6" />
+          </span>
+          <p class="font-display text-xl font-semibold">No hay productos con estos filtros</p>
+          <p class="text-sm text-ink-soft">Prueba quitando algún filtro o escríbenos y te ayudamos a encontrarlo.</p>
+          <a href={clearHref} class="mt-1 inline-flex min-h-11 items-center rounded-[13px] border-2 border-navy px-5 text-sm font-extrabold hover:bg-navy hover:text-white">
+            Limpiar filtros
+          </a>
+        </div>
+      )}
+
+      <Pagination url={url} page={page} pageCount={pageCount} />
+    </div>
+  </div>
+</section>
+
+<script>
+  // El orden se aplica al elegirlo (sin botón). Mientras navega, la rejilla se atenúa.
+  document.querySelectorAll<HTMLFormElement>('[data-sort-form]').forEach((form) => {
+    form.querySelector('select')?.addEventListener('change', () => form.requestSubmit())
+  })
+  document.addEventListener('click', (event) => {
+    const link = (event.target as HTMLElement).closest('a')
+    if (link && link.closest('details, [data-listing]') && link.pathname === location.pathname && !event.metaKey && !event.ctrlKey) {
+      document.querySelector('[data-listing]')?.classList.add('opacity-55', 'transition-opacity')
+    }
+  })
+</script>

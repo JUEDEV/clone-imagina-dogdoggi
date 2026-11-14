@@ -1,0 +1,22 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import PaymentReturn from '@/components/islands/PaymentReturn'
+import { WHATSAPP_URL } from '@/data/site'
+import { isOrderReference } from '@/lib/orders/reference'
+import { buildTitle } from '@/lib/seo'
+
+// Wompi vuelve con ?ref=<referencia>&id=<transacción>&env=test|prod.
+export const prerender = false
+
+const reference = Astro.url.searchParams.get('ref') ?? ''
+const transactionId = Astro.url.searchParams.get('id') ?? ''
+if (!isOrderReference(reference)) return Astro.redirect('/carrito')
+---
+
+<Layout title={buildTitle('Confirmando pago')} noindex>
+  <main id="main-content" class="bg-[#f2f7f8] py-14 md:py-20">
+    <div class="shell max-w-[720px]">
+      <PaymentReturn client:only="react" reference={reference} transactionId={transactionId} whatsappUrl={WHATSAPP_URL} />
+    </div>
+  </main>
+</Layout>

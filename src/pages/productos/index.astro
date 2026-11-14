@@ -1,0 +1,64 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import CatalogHeader from '@/components/organisms/catalog/CatalogHeader.astro'
+import ProductListing from '@/components/organisms/catalog/ProductListing.astro'
+import { categoryTreeIds, findCategoryBySlug, getCatalog, productsInCategory, rootCategories, searchProducts } from '@/lib/catalog'
+import { listingUrl, readListingParams, toggle } from '@/lib/catalog/listing'
+import { breadcrumbJsonLd, buildTitle, type Crumb } from '@/lib/seo'
+
+// Catálogo completo y resultados de búsqueda (?q=). SSR: lee el catálogo en cada visita (caché 60 s).
+export const prerender = false
+
+const catalog = await getCatalog()
+const url = Astro.url
+const params = readListingParams(url)
+
+let products = params.q ? searchProducts(catalog, params.q) : catalog.products
+const selected = params.categorias.map((slug) => findCategoryBySlug(catalog, slug)).filter((c) => c !== undefined)
+if (selected.length) {
+  const ids = new Set(selected.flatMap((c) => [...categoryTreeIds(catalog, c)]))
+  products = products.filter((p) => p.categoryId && ids.has(p.categoryId))
+}
+
+const roots = rootCategories(catalog)
+const base = params.q ? searchProducts(catalog, params.q) : catalog.products
+const categories = {
+  title: 'Categorías',
+  links: roots.map((c) => ({
+    label: c.name,
+    href: listingUrl(url, { categoria: toggle(params.categorias, c.slug) }),
+    count: productsInCategory(catalog, c).filter((p) => base.includes(p)).length,
+    active: params.categorias.includes(c.slug),
+  })),
+}
+
+const onlyOffers = params.destacados.length === 1 && params.destacados[0] === 'ofertas' && !params.q
+const title = params.q ? `Resultados para “${params.q}”` : onlyOffers ? 'Ofertas' : params.marcas.length === 1 ? params.marcas[0] : 'Productos'
+const crumbs: Crumb[] = [{ label: 'Inicio', href: '/' }, { label: params.q ? 'Búsqueda' : 'Productos' }]
+const filtered = url.search.length > 0
+const description = params.q
+  ? 'Herramientas, equipos y cosmética para tu peluquería canina.'
+  : 'Herramientas, equipos y cosmética profesional para peluqueros caninos. Envíos a todo el país.'
+---
+
+<Layout
+  title={buildTitle(title)}
+  description={description}
+  canonical="/productos"
+  noindex={filtered}
+  jsonLd={breadcrumbJsonLd(crumbs, Astro.site, url.pathname)}
+>
+  <main id="main-content">
+    <CatalogHeader crumbs={crumbs} title={title} description={params.q ? undefined : description} />
+    <ProductListing
+      catalog={catalog}
+      products={products}
+      url={url}
+      params={params}
+      categories={categories}
+      extraChips={params.q ? [{ label: `Búsqueda: ${params.q}`, href: listingUrl(url, { q: null }) }] : []}
+      clearHref={params.q ? listingUrl(new URL('/productos', url), { q: params.q }) : '/productos'}
+      keepOrder={Boolean(params.q)}
+    />
+  </main>
+</Layout>

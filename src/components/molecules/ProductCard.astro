@@ -1,67 +1,79 @@
 ---
-import Icon from '@/components/atoms/Icon.astro'
-import { discountOf, money, type Product } from '@/data/products'
+import AddToCart from '@/components/islands/AddToCart'
+import { toCartProduct } from '@/lib/cart/types'
+import type { Product } from '@/lib/catalog/types'
+import { discountPercent, money } from '@/lib/money'
 import { cn } from '@/lib/utils'
 
-// Tarjeta de producto. Variantes según la vitrina:
-// - default: la del slider de destacados.
+// Tarjeta de producto (vitrinas del home, listados y relacionados). Variantes:
+// - default: la del listado y el slider.
 // - feature: horizontal en escritorio ancho (vitrina Perfect Groom), compacta en móvil.
-// - compact: compacta en móvil (rejilla de ofertas de dos columnas).
-// TODO: favoritos y carrito quedan sin lógica hasta conectar el ecommerce (CMS).
+// - compact: compacta en móvil (rejillas de dos columnas).
+// El nombre de la categoría y su raíz (`kind`, para el filtro del home) los pasa el organismo.
 interface Props {
   product: Product
+  categoryName?: string
+  kind?: string
   variant?: 'default' | 'feature' | 'compact'
   class?: string
 }
 
-const { product, variant = 'default', class: className } = Astro.props
-const discount = discountOf(product)
-const tagClass =
-  product.tag === 'Oferta' ? 'bg-yellow text-navy' : product.tag === 'Nuevo' ? 'bg-turquoise text-navy' : 'bg-[#dff3fc] text-[#006594]'
+const { product, categoryName, kind, variant = 'default', class: className } = Astro.props
+const href = `/productos/${product.slug}`
+const discount = discountPercent(product.price, product.compareAtPrice)
+const soldOut = product.stock !== null && product.stock <= 0
+
+const BADGE_LABELS = { nuevo: 'Nuevo', oferta: 'Oferta', mas_vendido: 'Más vendido' } as const
+const tag = soldOut ? 'Agotado' : product.badge ? BADGE_LABELS[product.badge] : product.brand
+const tagClass = soldOut
+  ? 'bg-navy text-white'
+  : product.badge === 'oferta'
+    ? 'bg-yellow text-navy'
+    : product.badge === 'nuevo'
+      ? 'bg-turquoise text-navy'
+      : product.badge === 'mas_vendido'
+        ? 'bg-[#e3f5ea] text-[#155b3a]'
+        : 'bg-[#dff3fc] text-[#006594]'
 const feature = variant === 'feature'
 const small = variant !== 'default'
 const imageHeights = {
-  default: 'h-[240px] md:h-[265px]',
+  default: 'h-[200px] xs:h-[240px] md:h-[265px]',
   feature: 'h-[160px] md:h-[200px] desk:h-full',
   compact: 'h-[165px] md:h-[265px]',
 }
 ---
 
 <article
-  data-kind={product.kind}
+  data-kind={kind}
   class={cn(
     'group/card relative flex min-w-0 flex-col overflow-hidden rounded-[18px] border border-line bg-paper text-navy transition-[transform,box-shadow] duration-200 hover:-translate-y-1 hover:shadow-[0_14px_32px_rgba(5,28,72,0.1)]',
     feature && 'desk:grid desk:min-h-[245px] desk:grid-cols-[44%_1fr]',
     className,
   )}
 >
-  <div class:list={['relative shrink-0 overflow-hidden bg-surface', imageHeights[variant]]}>
-    {product.tag && (
-      <span class={cn('absolute top-3 left-3 z-[2] max-w-[100px] rounded-md px-[9px] py-1 text-[10px] font-extrabold md:max-w-none', tagClass)}>
-        {product.tag}
+  <a href={href} tabindex="-1" aria-hidden="true" class:list={['relative block shrink-0 overflow-hidden bg-surface', imageHeights[variant]]}>
+    {tag && (
+      <span class={cn('absolute top-3 left-3 z-[2] max-w-[110px] rounded-md px-[9px] py-1 text-[10px] font-extrabold md:max-w-none', tagClass)}>
+        {tag}
       </span>
     )}
-    {discount > 0 && (
+    {discount > 0 && !soldOut && (
       <span class="absolute top-[42px] left-3 z-[2] rounded-md bg-orange px-[9px] py-1 text-[10px] font-extrabold text-white">
         −{discount}%
       </span>
     )}
-    <button
-      type="button"
-      class="absolute top-[9px] right-[9px] z-[3] grid size-11 place-items-center rounded-full bg-white/90 text-navy"
-      aria-label={`Agregar ${product.name} a favoritos`}
-    >
-      <Icon name="heart" class="size-[19px]" />
-    </button>
     <img
       src={product.image}
-      alt={product.name}
+      alt=""
       loading="lazy"
-      class="h-full w-full object-contain mix-blend-multiply transition-transform duration-300 ease-out group-hover/card:scale-105"
+      class:list={[
+        'h-full w-full object-contain mix-blend-multiply transition-transform duration-300 ease-out group-hover/card:scale-105',
+        soldOut && 'opacity-70 grayscale',
+      ]}
     />
-  </div>
-  <div class:list={['flex flex-1 flex-col', small ? 'p-[13px] md:p-[18px]' : 'p-[18px]', feature && 'desk:p-5']}>
-    <p class="mb-1 text-[10px] font-extrabold tracking-[0.08em] text-ink-soft uppercase">{product.category}</p>
+  </a>
+  <div class:list={['flex flex-1 flex-col', small ? 'p-[13px] md:p-[18px]' : 'p-[14px] xs:p-[18px]', feature && 'desk:p-5']}>
+    {categoryName && <p class="mb-1 text-[10px] font-extrabold tracking-[0.08em] text-ink-soft uppercase">{categoryName}</p>}
     <h3
       class:list={[
         'mb-[13px] min-h-11 leading-[1.25] font-medium',
@@ -69,22 +81,27 @@ const imageHeights = {
         feature && 'desk:text-[17px]',
       ]}
     >
-      {product.name}
+      <a href={href} class="line-clamp-2 hover:text-orange-dark">{product.name}</a>
     </h3>
-    <div class="mb-3.5 flex flex-wrap items-baseline gap-2">
-      <strong class:list={['font-extrabold', small ? 'text-base md:text-xl' : 'text-xl']}>{money(product.price)}</strong>
-      {product.oldPrice && <del class="text-[13px] text-[#68758a]">{money(product.oldPrice)}</del>}
+    <div class="mb-3.5 flex flex-wrap items-baseline gap-x-2">
+      <strong class:list={['font-extrabold', small ? 'text-base md:text-xl' : 'text-lg xs:text-xl']}>{money(product.price)}</strong>
+      {product.compareAtPrice && (
+        <del class="text-[13px] text-[#68758a]">
+          <span class="sr-only">Antes</span>
+          {money(product.compareAtPrice)}
+        </del>
+      )}
     </div>
-    <button
-      type="button"
-      class:list={[
+    {/* client:idle y no visible: con visible, un clic rápido al hacer scroll llegaba antes de hidratar. */}
+    <AddToCart
+      client:idle
+      product={toCartProduct(product)}
+      iconClassName={small ? 'max-xs:hidden' : undefined}
+      className={cn(
         'mt-auto flex min-h-11 w-full items-center justify-center gap-2 rounded-[10px] border-[1.5px] border-orange px-2 font-extrabold text-[#b83f00] transition-colors duration-200 hover:bg-orange hover:text-white',
-        small ? 'text-[11px] md:text-[13px]' : 'text-[13px]',
+        small ? 'text-[11px] md:text-[13px]' : 'text-xs xs:text-[13px]',
         feature && 'desk:text-xs',
-      ]}
-    >
-      <Icon name="shopping-bag" class:list={["size-[17px] shrink-0", small && "max-xs:hidden"]} />
-      Agregar al carrito
-    </button>
+      )}
+    />
   </div>
 </article>

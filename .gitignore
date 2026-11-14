@@ -3,4 +3,8 @@ dist/
 .astro/
 .env
 .env.*
+!.env.example
 .idea/
+
+# Pedidos locales de desarrollo (sin Strata)
+.data/

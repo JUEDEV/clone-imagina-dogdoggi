@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { ArrowRight, ChevronDown, ChevronRight, Menu } from "lucide-react";
 import { Sheet, SheetClose, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import type { MegaMenuGroup, NavItem } from "@/data/site";
+import type { NavItem, ShopMenuItem } from "@/data/site";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 interface MobileMenuProps {
   before: NavItem[];
   shopLabel: string;
-  shop: MegaMenuGroup[];
+  shop: ShopMenuItem[];
   after: NavItem[];
   note?: string;
   cta?: ReactNode;
@@ -24,6 +24,7 @@ const external = (item: NavItem) => (item.external ? { target: "_blank", rel: "n
 
 export default function MobileMenu({ before, shopLabel, shop, after, note, cta }: MobileMenuProps) {
   const [shopOpen, setShopOpen] = useState(false);
+  const [openItem, setOpenItem] = useState<string | null>(null);
 
   const navLink = (item: NavItem) => (
     <SheetClose asChild key={item.label}>
@@ -61,21 +62,48 @@ export default function MobileMenu({ before, shopLabel, shop, after, note, cta }
             <ChevronDown className={cn("size-5 transition-transform duration-300", shopOpen && "rotate-180")} />
           </button>
           <div
-            className={cn("overflow-hidden transition-all duration-300", shopOpen ? "max-h-[600px]" : "max-h-0")}
+            className={cn("overflow-hidden transition-all duration-300", shopOpen ? "max-h-[1400px]" : "max-h-0")}
             inert={!shopOpen}
           >
-            {shop.map((group) => (
-              <div key={group.title} className="py-2 pl-4">
-                <strong className="block py-1 font-display text-[15px]">{group.title}</strong>
-                {group.links.map((link) => (
-                  <SheetClose asChild key={link.label}>
-                    <a href={link.href} className="flex min-h-11 items-center text-sm text-ink-soft">
-                      {link.label}
-                    </a>
-                  </SheetClose>
-                ))}
-              </div>
-            ))}
+            <ul className="py-1 pl-3">
+              {shop.map((item) =>
+                item.children ? (
+                  <li key={item.href}>
+                    <button
+                      type="button"
+                      onClick={() => setOpenItem((v) => (v === item.href ? null : item.href))}
+                      aria-expanded={openItem === item.href}
+                      className="flex min-h-11 w-full items-center justify-between text-left text-sm font-bold"
+                    >
+                      {item.label}
+                      <ChevronDown className={cn("size-4 transition-transform duration-300", openItem === item.href && "rotate-180")} />
+                    </button>
+                    <ul
+                      className={cn("overflow-hidden border-l-2 border-turquoise pl-3 transition-all duration-300", openItem === item.href ? "max-h-[600px]" : "max-h-0")}
+                      inert={openItem !== item.href}
+                    >
+                      {[...item.children, { label: `Ver todo en ${item.label}`, href: item.href }].map((child, i, all) => (
+                        <li key={child.href}>
+                          <SheetClose asChild>
+                            <a href={child.href} className={cn("flex min-h-11 items-center text-sm text-ink-soft", i === all.length - 1 && "font-extrabold text-orange-dark")}>
+                              {child.label}
+                            </a>
+                          </SheetClose>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ) : (
+                  <li key={item.href}>
+                    <SheetClose asChild>
+                      <a href={item.href} className="flex min-h-11 items-center text-sm font-bold">
+                        {item.label}
+                      </a>
+                    </SheetClose>
+                  </li>
+                ),
+              )}
+            </ul>
           </div>
 
           {after.map(navLink)}

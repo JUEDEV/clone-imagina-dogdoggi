@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  * abre el formulario flotante bajo el header.
  */
 export interface SearchResult {
-  id: number;
+  id: string;
   name: string;
   category: string;
   price: string;
@@ -18,6 +18,8 @@ export interface SearchResult {
 
 interface SearchBoxProps {
   endpoint?: string;
+  /** Página de resultados completos (`?q=`). */
+  resultsPage?: string;
   placeholder?: string;
   /** Sugerencias para el estado vacío. */
   hints?: string[];
@@ -27,6 +29,7 @@ type Status = "idle" | "loading" | "done" | "error";
 
 export default function SearchBox({
   endpoint = "/api/search",
+  resultsPage = "/productos",
   placeholder = "Buscar productos…",
   hints = [],
 }: SearchBoxProps) {
@@ -34,6 +37,7 @@ export default function SearchBox({
   const [query, setQuery] = useState("");
   const [submitted, setSubmitted] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [total, setTotal] = useState(0);
   const [status, setStatus] = useState<Status>("idle");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -44,8 +48,9 @@ export default function SearchBox({
     setStatus("loading");
     fetch(`${endpoint}?q=${encodeURIComponent(submitted)}`, { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : Promise.reject(res.status)))
-      .then((data: SearchResult[]) => {
-        setResults(data);
+      .then((data: { products: SearchResult[]; total: number }) => {
+        setResults(data.products);
+        setTotal(data.total);
         setStatus("done");
       })
       .catch(() => {
@@ -154,6 +159,14 @@ export default function SearchBox({
                         </a>
                       </li>
                     ))}
+                    <li>
+                      <a
+                        href={`${resultsPage}?q=${encodeURIComponent(submitted)}`}
+                        className="flex min-h-12 items-center justify-center gap-2 border-t border-line text-sm font-extrabold hover:text-orange-dark"
+                      >
+                        Ver todos los resultados ({total}) <ArrowUpRight className="size-4" />
+                      </a>
+                    </li>
                   </ul>
                 ) : (
                   <div className="flex flex-col px-3 py-6 text-ink-soft">

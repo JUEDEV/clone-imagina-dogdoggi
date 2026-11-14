@@ -23,6 +23,10 @@ node dist/server/entry.mjs
 
 `PUBLIC_SITE_URL` (en el build) fija el dominio de los canonical, el sitemap y `robots.txt`. Por defecto es `https://dogdoggi.com`.
 
+La tienda lee el catálogo y guarda los pedidos en Strata (`CMS_BASE_URL`, `CMS_STATIC_TOKEN`) y cobra con Wompi (`WOMPI_*`). Sin Strata usa un catálogo de muestra; sin llaves de Wompi el pago se simula en desarrollo. Todas las variables están en `.env.example`.
+
+El formulario de `/contacto` envía por SMTP: en el contenedor van `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` y opcional `CONTACT_NOTIFY_TO` (ver `ARCHITECTURE.md`).
+
 ### Docker
 
 ```bash

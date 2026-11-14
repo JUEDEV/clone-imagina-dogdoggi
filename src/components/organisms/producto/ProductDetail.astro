@@ -1,0 +1,150 @@
+---
+import Eyebrow from '@/components/atoms/Eyebrow.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import Breadcrumb from '@/components/molecules/Breadcrumb.astro'
+import AddToCart from '@/components/islands/AddToCart'
+import { toCartProduct } from '@/lib/cart/types'
+import type { Category, Product } from '@/lib/catalog'
+import { discountPercent, money } from '@/lib/money'
+import { waLink } from '@/data/site'
+import type { Crumb } from '@/lib/seo'
+
+// Ficha de producto (Herbolario): galería, precio, disponibilidad, cantidad +
+// agregar al carrito, consulta por WhatsApp y descripción.
+// La galería cambia la foto principal con un <script> corto (sin isla).
+interface Props {
+  product: Product
+  category?: Category
+  crumbs: Crumb[]
+  url: string
+}
+
+const { product, category, crumbs, url } = Astro.props
+const discount = discountPercent(product.price, product.compareAtPrice)
+const soldOut = product.stock !== null && product.stock <= 0
+const stockLabel = soldOut
+  ? 'Agotado'
+  : product.stock === null
+    ? 'Disponible'
+    : product.stock <= 5
+      ? `¡Últimas ${product.stock} ${product.stock === 1 ? 'unidad' : 'unidades'}!`
+      : `${product.stock} disponibles`
+const whatsapp = waLink(`Hola, me interesa el producto ${product.name} de ${money(product.price)}. ¿Me pueden dar más información? ${url}`)
+---
+
+<section class="bg-paper pt-5 pb-12 md:pt-7 md:pb-20">
+  <div class="shell">
+    <Breadcrumb items={crumbs} />
+
+    <div class="grid gap-8 md:grid-cols-[1.05fr_0.95fr] md:gap-10 desk:gap-16">
+      <div data-gallery>
+        <div class="relative aspect-square overflow-hidden rounded-[22px] border border-line bg-surface">
+          {discount > 0 && !soldOut && (
+            <span class="absolute top-4 left-4 z-[2] rounded-lg bg-orange px-3 py-1.5 text-sm font-extrabold text-white">−{discount}%</span>
+          )}
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            fetchpriority="high"
+            data-gallery-main
+            class:list={['size-full object-contain p-6 mix-blend-multiply', soldOut && 'opacity-70 grayscale']}
+          />
+        </div>
+        {product.images.length > 1 && (
+          <div class="mt-3 grid grid-cols-5 gap-2">
+            {product.images.map((image, i) => (
+              <button
+                type="button"
+                data-gallery-thumb={image}
+                aria-label={`Ver foto ${i + 1} de ${product.images.length}`}
+                aria-pressed={i === 0 ? 'true' : 'false'}
+                class="aspect-square overflow-hidden rounded-xl border-2 border-line bg-surface aria-pressed:border-navy"
+              >
+                <img src={image} alt="" loading="lazy" class="size-full object-contain p-1 mix-blend-multiply" />
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div>
+        {(product.brand || category) && (
+          <Eyebrow class="text-turquoise-dark">
+            {product.brand ? <a href={`/productos?marca=${encodeURIComponent(product.brand)}`} class="hover:underline">{product.brand}</a> : category?.name}
+          </Eyebrow>
+        )}
+        <h1 class="mt-2 text-[32px] leading-[1.1] font-semibold tracking-[-0.025em] md:text-[clamp(32px,3.2vw,46px)]">{product.name}</h1>
+
+        <div class="mt-5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <strong class="text-[34px] font-extrabold">{money(product.price)}</strong>
+          {product.compareAtPrice && (
+            <del class="text-lg text-[#68758a]"><span class="sr-only">Antes</span>{money(product.compareAtPrice)}</del>
+          )}
+        </div>
+        <p class="mt-1 text-xs text-ink-soft">Precio con IVA incluido.</p>
+
+        <div class="mt-6 flex flex-wrap items-center justify-between gap-2 rounded-2xl bg-mint px-4 py-3 text-sm">
+          <span class:list={['flex items-center gap-2 font-extrabold', soldOut ? 'text-[#a21b13]' : 'text-[#155b3a]']}>
+            <span class:list={['size-2.5 rounded-full', soldOut ? 'bg-[#a21b13]' : 'bg-[#1f9d55]']}></span>
+            {stockLabel}
+          </span>
+          {product.sku && <span class="text-ink-soft">Ref. {product.sku}</span>}
+        </div>
+
+        <div class="mt-6">
+          <AddToCart
+            client:load
+            product={toCartProduct(product)}
+            withQuantity
+            className="flex min-h-12 flex-1 items-center justify-center gap-2.5 rounded-[13px] bg-orange px-6 font-extrabold text-white transition-colors hover:bg-orange-dark sm:min-w-[240px]"
+          />
+        </div>
+
+        <a
+          href={whatsapp}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mt-3 flex min-h-12 items-center justify-center gap-2.5 rounded-[13px] border-2 border-[#087f5b] px-6 font-extrabold text-[#087f5b] transition-colors hover:bg-[#087f5b] hover:text-white"
+        >
+          <Icon name="whatsapp" class="size-5" />
+          {soldOut ? 'Pregunta cuándo llega' : '¿Dudas? Pregúntanos por WhatsApp'}
+        </a>
+
+        <ul class="mt-6 grid gap-2.5 border-t border-line pt-5 text-sm">
+          <li class="flex items-center gap-2.5"><Icon name="truck" class="size-5 text-turquoise-dark" /> Envíos a todo el país</li>
+          <li class="flex items-center gap-2.5"><Icon name="map-pin" class="size-5 text-turquoise-dark" /> Recoge gratis en nuestras sedes de Pereira e Ibagué</li>
+          <li class="flex items-center gap-2.5"><Icon name="shield-check" class="size-5 text-turquoise-dark" /> Pago seguro con Wompi (PSE, tarjetas, Nequi)</li>
+        </ul>
+
+        {category && (
+          <p class="mt-5 text-sm text-ink-soft">
+            Categoría: <a href={`/categorias/${category.slug}`} class="font-bold text-navy hover:underline">{category.name}</a>
+          </p>
+        )}
+      </div>
+    </div>
+
+    <div class="mt-12 max-w-[820px] md:mt-16">
+      <h2 class="mb-4 text-[26px] font-semibold md:text-[32px]">Descripción</h2>
+      {product.description ? (
+        <div class="prose-dd" set:html={product.description} />
+      ) : (
+        <p class="text-ink-soft">Este producto no tiene información adicional por ahora. Escríbenos y te contamos más.</p>
+      )}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Galería: la miniatura elegida pasa a la foto principal.
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+    const main = gallery.querySelector<HTMLImageElement>('[data-gallery-main]')
+    const thumbs = gallery.querySelectorAll<HTMLButtonElement>('[data-gallery-thumb]')
+    thumbs.forEach((thumb) =>
+      thumb.addEventListener('click', () => {
+        if (main) main.src = thumb.dataset.galleryThumb ?? main.src
+        thumbs.forEach((t) => t.setAttribute('aria-pressed', String(t === thumb)))
+      }),
+    )
+  })
+</script>

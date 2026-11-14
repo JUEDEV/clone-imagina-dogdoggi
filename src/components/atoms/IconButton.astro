@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils'
 
 // Botón circular de 44px con ícono (acciones del header). Si recibe `href`
 // se pinta como enlace; si no, como botón.
-// TODO: cuenta, favoritos y carrito quedan sin lógica hasta conectar el
-// ecommerce de Strata (skill conectar-cms); `count` muestra la burbuja.
+// TODO: cuenta y favoritos quedan sin lógica hasta la fase de clientes
+// (login de Strata); `count` muestra la burbuja.
 interface Props extends HTMLAttributes<'button'> {
   icon: IconName
   label: string

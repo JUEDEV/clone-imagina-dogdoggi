@@ -1,0 +1,84 @@
+---
+import ButtonLink from '@/components/atoms/ButtonLink.astro'
+import Icon from '@/components/atoms/Icon.astro'
+import { WHATSAPP_URL, waLink } from '@/data/site'
+import { money } from '@/lib/money'
+import type { Order } from '@/lib/orders/types'
+
+// Resumen del pedido en /checkout/gracias (Herbolario): estado del pago,
+// datos del cliente, entrega y productos. Imprimible con el botón del navegador.
+interface Props {
+  order: Order
+}
+
+const { order } = Astro.props
+const paid = order.status === 'paid' || order.status === 'fulfilled'
+const date = new Date(order.created_at).toLocaleDateString('es-CO', { day: 'numeric', month: 'long', year: 'numeric' })
+const help = waLink(`Hola Dog Doggi, tengo una pregunta sobre mi pedido ${order.reference}.`)
+---
+
+<div class="shell max-w-[860px]">
+  <div class="rounded-[22px] border border-line bg-paper p-6 text-center md:p-10">
+    <span class:list={['mx-auto grid size-16 place-items-center rounded-full', paid ? 'bg-[#e3f5ea] text-[#1f9d55]' : 'bg-[#fff8e5] text-orange-dark']}>
+      <Icon name={paid ? 'circle-check' : 'clock'} class="size-8" />
+    </span>
+    <h1 class="mt-4 text-[34px] leading-[1.1] font-semibold md:text-5xl">{paid ? '¡Gracias por tu compra!' : 'Recibimos tu pedido'}</h1>
+    <p class="mx-auto mt-3 max-w-[520px] text-ink-soft">
+      {paid
+        ? `Tu pago fue aprobado. Te escribiremos a ${order.contact.email} cuando tu pedido esté en camino.`
+        : 'Tu pago está en proceso. Te confirmaremos por correo apenas Wompi lo apruebe.'}
+    </p>
+    <p class="mt-4 inline-flex flex-wrap items-center justify-center gap-x-2 rounded-full bg-mint px-4 py-1.5 text-sm">
+      Pedido <strong class="font-extrabold">{order.reference}</strong> · {date}
+    </p>
+  </div>
+
+  <div class="mt-5 grid gap-5 md:grid-cols-2">
+    <section class="rounded-[22px] border border-line bg-paper p-6">
+      <h2 class="mb-3 text-xl font-semibold">Tus datos</h2>
+      <p class="font-bold">{order.contact.first_name} {order.contact.last_name}</p>
+      <p class="text-sm text-ink-soft">{order.contact.email}</p>
+      <p class="text-sm text-ink-soft">{order.contact.phone}</p>
+    </section>
+    <section class="rounded-[22px] border border-line bg-paper p-6">
+      <h2 class="mb-3 text-xl font-semibold">Entrega</h2>
+      <p class="font-bold">{order.delivery.label}</p>
+      {order.shipping_address && (
+        <p class="text-sm text-ink-soft">
+          {order.shipping_address.address_1}
+          {order.shipping_address.address_2 && `, ${order.shipping_address.address_2}`}
+          <br />
+          {order.shipping_address.city}, {order.shipping_address.province}
+        </p>
+      )}
+    </section>
+  </div>
+
+  <section class="mt-5 rounded-[22px] border border-line bg-paper p-6">
+    <h2 class="mb-4 text-xl font-semibold">Productos</h2>
+    <ul class="divide-y divide-line">
+      {order.items.map((item) => (
+        <li class="flex items-center justify-between gap-4 py-3 text-sm">
+          <span>
+            <span class="font-bold">{item.name}</span>
+            <span class="text-ink-soft"> × {item.quantity}</span>
+          </span>
+          <span class="font-extrabold">{money(item.subtotal)}</span>
+        </li>
+      ))}
+    </ul>
+    <dl class="mt-3 space-y-1.5 border-t border-line pt-4 text-sm">
+      <div class="flex justify-between"><dt>Subtotal</dt><dd class="font-bold">{money(order.subtotal)}</dd></div>
+      <div class="flex justify-between">
+        <dt>Envío</dt>
+        <dd class="font-bold">{order.shipping_total > 0 ? money(order.shipping_total) : order.delivery.pickup ? 'Gratis' : 'Contra entrega'}</dd>
+      </div>
+      <div class="flex justify-between border-t border-line pt-3 text-base"><dt class="font-bold">Total</dt><dd class="text-xl font-extrabold">{money(order.total)}</dd></div>
+    </dl>
+  </section>
+
+  <div class="mt-6 flex flex-col justify-center gap-3 sm:flex-row print:hidden">
+    <ButtonLink href="/productos">Seguir comprando <Icon name="arrow-right" class="size-[18px]" /></ButtonLink>
+    <ButtonLink href={help || WHATSAPP_URL} external variant="outline"><Icon name="whatsapp" class="size-5" /> ¿Dudas con tu pedido?</ButtonLink>
+  </div>
+</div>

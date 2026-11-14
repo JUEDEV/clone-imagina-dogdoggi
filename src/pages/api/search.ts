@@ -1,26 +1,29 @@
 import type { APIRoute } from 'astro'
-import { money, productHref, searchProducts } from '@/data/products'
+import { findCategoryById, getCatalog, searchProducts } from '@/lib/catalog'
+import { money } from '@/lib/money'
 
-// Endpoint del buscador del header (reemplaza el tRPC de la plantilla).
-// Corre en el servidor; cuando se conecte el CMS basta con cambiar searchProducts.
+// Sugerencias del buscador del header. Usa la misma búsqueda que /productos?q=.
 export const prerender = false
 
-export const GET: APIRoute = ({ url }) => {
-  const query = (url.searchParams.get('q') ?? '').trim()
+const LIMIT = 6
 
-  if (!query || query.length > 100) {
-    return Response.json({ error: 'El parámetro q debe tener entre 1 y 100 caracteres.' }, { status: 400 })
+export const GET: APIRoute = async ({ url }) => {
+  const query = (url.searchParams.get('q') ?? '').trim()
+  if (!query || query.length > 80) {
+    return Response.json({ error: 'El parámetro q debe tener entre 1 y 80 caracteres.' }, { status: 400 })
   }
 
+  const catalog = await getCatalog()
+  const found = searchProducts(catalog, query)
   // Solo lo que pinta la isla.
-  const results = searchProducts(query).map((product) => ({
+  const products = found.slice(0, LIMIT).map((product) => ({
     id: product.id,
     name: product.name,
-    category: product.category,
+    category: findCategoryById(catalog, product.categoryId)?.name ?? '',
     price: money(product.price),
     image: product.image,
-    href: productHref(product),
+    href: `/productos/${product.slug}`,
   }))
 
-  return Response.json(results, { headers: { 'Cache-Control': 'public, max-age=60' } })
+  return Response.json({ products, total: found.length }, { headers: { 'Cache-Control': 'public, max-age=60' } })
 }

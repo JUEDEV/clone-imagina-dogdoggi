@@ -4,7 +4,13 @@ import Icon from '@/components/atoms/Icon.astro'
 import Reveal from '@/components/atoms/Reveal.astro'
 import ProductCard from '@/components/molecules/ProductCard.astro'
 import { PERFECT_BENEFITS } from '@/data/home'
-import { COSMETICS } from '@/data/products'
+import { cardContext, findCategoryBySlug, getCatalog, productsInCategory } from '@/lib/catalog'
+
+// Vitrina de la línea: primero Perfect Groom y luego el resto de cosmética.
+const catalog = await getCatalog()
+const cosmetics = findCategoryBySlug(catalog, 'cosmetica')
+const pool = cosmetics ? productsInCategory(catalog, cosmetics) : catalog.products
+const products = [...pool].sort((a, b) => Number(b.brand === 'Perfect Groom') - Number(a.brand === 'Perfect Groom')).slice(0, 4)
 ---
 
 <section id="perfect-groom" class="relative overflow-hidden bg-pg-deep py-[60px] text-white md:py-[90px]">
@@ -40,14 +46,14 @@ import { COSMETICS } from '@/data/products'
           </li>
         ))}
       </ul>
-      <ButtonLink href="#destacados" variant="outline-light" class="col-span-full w-full text-[13px] md:w-auto md:text-base">
+      <ButtonLink href="/productos?marca=Perfect+Groom" variant="outline-light" class="col-span-full w-full text-[13px] md:w-auto md:text-base">
         Ver toda la línea Perfect Groom
         <Icon name="arrow-right" class="size-[18px]" />
       </ButtonLink>
     </Reveal>
 
     <Reveal delay={120} class="grid grid-cols-2 gap-2 xs:gap-2.5 md:grid-cols-4 md:gap-4 desk:grid-cols-2">
-      {COSMETICS.slice(0, 4).map((product) => <ProductCard product={product} variant="feature" />)}
+      {products.map((product) => <ProductCard product={product} {...cardContext(catalog, product)} variant="feature" />)}
     </Reveal>
   </div>
 </section>

@@ -1,0 +1,39 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import CatalogHeader from '@/components/organisms/catalog/CatalogHeader.astro'
+import CheckoutForm from '@/components/islands/CheckoutForm'
+import { PRIVACY_POLICY_URL } from '@/data/contacto'
+import { WHATSAPP_URL } from '@/data/site'
+import { getShippingOptions } from '@/lib/checkout/shipping'
+import { getOrderRepository } from '@/lib/orders/repository'
+import { getPaymentMode } from '@/lib/payments/wompi'
+import { buildTitle } from '@/lib/seo'
+
+// SSR: las formas de entrega y el modo de pago dependen de Strata y de las llaves de Wompi.
+export const prerender = false
+
+const shippingOptions = await getShippingOptions()
+const paymentMode = getOrderRepository() ? getPaymentMode() : 'disabled'
+---
+
+<Layout title={buildTitle('Finalizar compra')} noindex>
+  <main id="main-content">
+    <CatalogHeader
+      crumbs={[{ label: 'Inicio', href: '/' }, { label: 'Carrito', href: '/carrito' }, { label: 'Finalizar compra' }]}
+      title="Finalizar compra"
+    />
+    <section class="bg-[#f2f7f8] py-8 md:py-12">
+      <div class="shell">
+        <CheckoutForm
+          client:only="react"
+          shippingOptions={shippingOptions}
+          paymentMode={paymentMode}
+          privacyUrl={PRIVACY_POLICY_URL}
+          whatsappUrl={WHATSAPP_URL}
+        >
+          <p slot="fallback" class="py-16 text-center text-ink-soft">Cargando tu pedido…</p>
+        </CheckoutForm>
+      </div>
+    </section>
+  </main>
+</Layout>

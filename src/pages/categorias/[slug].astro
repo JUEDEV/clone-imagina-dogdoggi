@@ -1,0 +1,60 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import CatalogHeader from '@/components/organisms/catalog/CatalogHeader.astro'
+import ProductListing from '@/components/organisms/catalog/ProductListing.astro'
+import { categoryPath, childCategories, findCategoryBySlug, getCatalog, productsInCategory } from '@/lib/catalog'
+import { readListingParams } from '@/lib/catalog/listing'
+import { breadcrumbJsonLd, buildTitle, type Crumb } from '@/lib/seo'
+
+// Categoría con sus subcategorías (Herbolario): la barra lateral lista las
+// hermanas/hijas como enlaces a su propia ruta. SSR.
+export const prerender = false
+
+const catalog = await getCatalog()
+const category = findCategoryBySlug(catalog, Astro.params.slug ?? '')
+if (!category) return new Response(null, { status: 404 })
+
+const url = Astro.url
+const params = readListingParams(url)
+const path = categoryPath(catalog, category)
+const parent = path.length > 1 ? path[path.length - 2] : undefined
+// En una raíz se listan sus hijas; en una hija, las hermanas (con "Todas" hacia la raíz).
+const listParent = childCategories(catalog, category.id).length ? category : parent
+const siblings = listParent ? childCategories(catalog, listParent.id) : []
+const categories = listParent
+  ? {
+      title: listParent.name,
+      links: [
+        { label: 'Todas', href: `/categorias/${listParent.slug}`, count: productsInCategory(catalog, listParent).length, active: listParent.id === category.id },
+        ...siblings.map((c) => ({ label: c.name, href: `/categorias/${c.slug}`, count: productsInCategory(catalog, c).length, active: c.id === category.id })),
+      ],
+    }
+  : undefined
+
+const crumbs: Crumb[] = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Productos', href: '/productos' },
+  ...path.map((c, i) => (i === path.length - 1 ? { label: c.name } : { label: c.name, href: `/categorias/${c.slug}` })),
+]
+const description = category.description ?? parent?.description ?? `${category.name} para peluqueros caninos profesionales.`
+---
+
+<Layout
+  title={buildTitle(category.name)}
+  description={description}
+  canonical={`/categorias/${category.slug}`}
+  noindex={url.search.length > 0}
+  jsonLd={breadcrumbJsonLd(crumbs, Astro.site, url.pathname)}
+>
+  <main id="main-content">
+    <CatalogHeader crumbs={crumbs} title={category.name} description={description} />
+    <ProductListing
+      catalog={catalog}
+      products={productsInCategory(catalog, category)}
+      url={url}
+      params={params}
+      categories={categories}
+      clearHref={`/categorias/${category.slug}`}
+    />
+  </main>
+</Layout>

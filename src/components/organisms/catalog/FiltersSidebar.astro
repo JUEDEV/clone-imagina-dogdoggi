@@ -1,0 +1,117 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import { HIGHLIGHTS, PRICE_RANGES, activeFilterCount, listingUrl, toggle, type ListingParams } from '@/lib/catalog/listing'
+
+// Filtros del listado, como Herbolario: cada opción es un enlace que agrega o
+// quita el valor de la URL (sin JS, funciona con el botón atrás y se puede
+// compartir). En móvil se pliegan en un <details>.
+export interface CategoryLink {
+  label: string
+  href: string
+  count: number
+  active: boolean
+}
+
+interface Props {
+  url: URL
+  params: ListingParams
+  /** Subcategorías (en /categorias) o categorías (en /productos). */
+  categories?: { title: string; links: CategoryLink[] }
+  brands: { name: string; count: number }[]
+  /** URL para limpiar todo (conserva la búsqueda o la categoría actual). */
+  clearHref: string
+}
+
+const { url, params, categories, brands, clearHref } = Astro.props
+const count = activeFilterCount(params)
+
+const optionClass =
+  'group/opt flex min-h-10 items-center gap-2.5 rounded-lg px-1.5 text-sm transition-colors hover:bg-mint aria-[current=true]:font-extrabold'
+const box = (radio = false) =>
+  `grid size-[18px] shrink-0 place-items-center border-[1.5px] border-[#9fb1bd] text-white group-aria-[current=true]/opt:border-navy group-aria-[current=true]/opt:bg-navy ${radio ? 'rounded-full' : 'rounded-[5px]'}`
+// Marca interna del checkbox (cuadrito blanco cuando la opción está activa).
+const check = '<span class="hidden size-2 rounded-[2px] bg-white group-aria-[current=true]/opt:block"></span>'
+---
+
+<details class="group/filters rounded-[18px] border border-line bg-paper md:sticky md:top-4 md:block" open>
+  <summary
+    class="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 font-extrabold md:pointer-events-none md:min-h-14 md:border-b md:border-line [&::-webkit-details-marker]:hidden"
+  >
+    <span class="flex items-center gap-2">
+      Filtrar
+      {count > 0 && <span class="grid h-5 min-w-5 place-items-center rounded-full bg-orange px-1.5 text-[11px] text-white">{count}</span>}
+    </span>
+    <Icon name="chevron-right" class="size-5 rotate-90 transition-transform group-open/filters:-rotate-90 md:hidden" />
+  </summary>
+
+  <div class="space-y-5 px-3 pt-2 pb-4 md:pt-4">
+    {count > 0 && (
+      <a href={clearHref} class="ml-1.5 inline-flex min-h-9 items-center text-sm font-extrabold text-orange-dark hover:underline">
+        Limpiar filtros ({count})
+      </a>
+    )}
+
+    {categories && categories.links.length > 0 && (
+      <fieldset>
+        <legend class="mb-1.5 px-1.5 text-[11px] font-extrabold tracking-[0.1em] text-ink-soft uppercase">{categories.title}</legend>
+        {categories.links.map((link) => (
+          <a href={link.href} class={optionClass} aria-current={link.active ? 'true' : undefined}>
+            <span class={box(true)}><span class="size-1.5 rounded-full bg-white"></span></span>
+            <span class="flex-1">{link.label}</span>
+            <span class="text-xs text-ink-soft">{link.count}</span>
+          </a>
+        ))}
+      </fieldset>
+    )}
+
+    {brands.length > 0 && (
+      <fieldset>
+        <legend class="mb-1.5 px-1.5 text-[11px] font-extrabold tracking-[0.1em] text-ink-soft uppercase">Marca</legend>
+        {brands.map((brand) => {
+          const active = params.marcas.includes(brand.name)
+          return (
+            <a href={listingUrl(url, { marca: toggle(params.marcas, brand.name) })} class={optionClass} aria-current={active ? 'true' : undefined} rel="nofollow">
+              <span class={box()}><Fragment set:html={check} /></span>
+              <span class="flex-1">{brand.name}</span>
+              <span class="text-xs text-ink-soft">{brand.count}</span>
+            </a>
+          )
+        })}
+      </fieldset>
+    )}
+
+    <fieldset>
+      <legend class="mb-1.5 px-1.5 text-[11px] font-extrabold tracking-[0.1em] text-ink-soft uppercase">Precio</legend>
+      {PRICE_RANGES.map((range) => {
+        const active = params.precios.includes(range.value)
+        return (
+          <a href={listingUrl(url, { precio: toggle(params.precios, range.value) })} class={optionClass} aria-current={active ? 'true' : undefined} rel="nofollow">
+            <span class={box()}><Fragment set:html={check} /></span>
+            <span class="flex-1">{range.label}</span>
+          </a>
+        )
+      })}
+    </fieldset>
+
+    <fieldset>
+      <legend class="mb-1.5 px-1.5 text-[11px] font-extrabold tracking-[0.1em] text-ink-soft uppercase">Destacados</legend>
+      {HIGHLIGHTS.map((highlight) => {
+        const active = params.destacados.includes(highlight.value)
+        return (
+          <a href={listingUrl(url, { destacado: toggle(params.destacados, highlight.value) })} class={optionClass} aria-current={active ? 'true' : undefined} rel="nofollow">
+            <span class={box()}><Fragment set:html={check} /></span>
+            <span class="flex-1">{highlight.label}</span>
+          </a>
+        )
+      })}
+    </fieldset>
+  </div>
+</details>
+
+<script>
+  // En escritorio los filtros siempre van abiertos; en móvil arrancan plegados.
+  const media = window.matchMedia('(max-width: 47.99rem)')
+  const sync = () => document.querySelectorAll<HTMLDetailsElement>('details.group\\/filters').forEach((d) => (d.open = !media.matches))
+  sync()
+  media.addEventListener('change', sync)
+</script>

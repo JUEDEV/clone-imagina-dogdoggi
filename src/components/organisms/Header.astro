@@ -3,11 +3,14 @@ import ButtonLink from '@/components/atoms/ButtonLink.astro'
 import Icon from '@/components/atoms/Icon.astro'
 import IconButton from '@/components/atoms/IconButton.astro'
 import Logo from '@/components/atoms/Logo.astro'
+import CartDrawer from '@/components/islands/CartDrawer'
 import MegaMenu from '@/components/islands/MegaMenu'
 import MobileMenu from '@/components/islands/MobileMenu'
 import SearchBox from '@/components/islands/SearchBox'
 import { NAV_AFTER, NAV_BEFORE, SHOP_MENU, WHATSAPP_URL, externalAttrs } from '@/data/site'
 
+// Marca el ítem de la página actual (Nosotros, Contacto, Blog…).
+const current = (href: string) => href !== '/' && !href.includes('#') && Astro.url.pathname.startsWith(href)
 const navLinkClass = 'inline-flex min-h-11 items-center text-sm font-extrabold transition-colors hover:text-orange'
 ---
 
@@ -40,11 +43,10 @@ const navLinkClass = 'inline-flex min-h-11 items-center text-sm font-extrabold t
         hints={['tijera', 'shampoo', 'cepillo']}
       />
 
-      {/* TODO: cuenta, favoritos y carrito sin lógica hasta conectar el ecommerce (CMS). */}
+      {/* TODO: cuenta y favoritos llegan con la fase de clientes (login de Strata). */}
       <div class="flex items-center md:gap-0 desk:gap-[7px]">
         <IconButton icon="user" label="Mi cuenta" class="hidden desk:inline-grid" />
-        <IconButton icon="heart" label="Favoritos" count={0} class="hidden md:inline-grid" />
-        <IconButton icon="shopping-bag" label="Carrito de compras" count={0} />
+        <CartDrawer client:idle />
       </div>
     </div>
   </div>
@@ -54,10 +56,10 @@ const navLinkClass = 'inline-flex min-h-11 items-center text-sm font-extrabold t
       {NAV_BEFORE.map((item) => (
         <a href={item.href} {...externalAttrs(item)} class:list={[navLinkClass, item.highlight && 'text-pg-ink']}>{item.label}</a>
       ))}
-      <MegaMenu client:media="(min-width: 768px)" label="Tienda" groups={SHOP_MENU}>
+      <MegaMenu client:media="(min-width: 768px)" label="Tienda" items={SHOP_MENU}>
         <a
           slot="featured"
-          href="/#perfect-groom"
+          href="/productos?marca=Perfect+Groom"
           class="flex flex-col justify-center rounded-2xl bg-[#e8f7fd] p-[22px] transition-colors hover:bg-[#d9f1fb]"
         >
           <img
@@ -75,7 +77,14 @@ const navLinkClass = 'inline-flex min-h-11 items-center text-sm font-extrabold t
         </a>
       </MegaMenu>
       {NAV_AFTER.map((item) => (
-        <a href={item.href} {...externalAttrs(item)} class={navLinkClass}>{item.label}</a>
+        <a
+          href={item.href}
+          {...externalAttrs(item)}
+          aria-current={current(item.href) ? 'page' : undefined}
+          class:list={[navLinkClass, 'aria-[current=page]:text-orange-dark aria-[current=page]:underline aria-[current=page]:decoration-2 aria-[current=page]:underline-offset-8']}
+        >
+          {item.label}
+        </a>
       ))}
     </div>
   </nav>

@@ -163,6 +163,76 @@
   }
 }
 
+/* Inputs, select y textarea del formulario de contacto. El rojo de error sale de
+   `data-invalid` en el contenedor (FormField), que llena el script del formulario. */
+@utility form-control {
+  width: 100%;
+  min-height: 54px;
+  border: 1.5px solid #cbd8df;
+  border-radius: 11px;
+  background: #fff;
+  color: var(--color-navy);
+  padding: 13px 15px;
+  font: inherit;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  &::placeholder {
+    color: #778395;
+  }
+  &:hover {
+    border-color: #8ba5b2;
+  }
+  &:focus {
+    outline: 0;
+    border-color: var(--color-turquoise-dark);
+    box-shadow: 0 0 0 3px rgb(31 207 204 / 0.22);
+  }
+  &:focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 2px;
+  }
+  [data-invalid] > & {
+    border-color: #b42318;
+    background: #fffafa;
+  }
+}
+
+/* Texto enriquecido que llega del CMS (descripción de producto). */
+@utility prose-dd {
+  color: var(--color-ink-soft);
+  font-size: 16px;
+  line-height: 1.75;
+  & > * + * {
+    margin-top: 1em;
+  }
+  & :where(h2, h3, h4) {
+    color: var(--color-navy);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-top: 1.5em;
+  }
+  & :where(ul, ol) {
+    padding-left: 1.3em;
+  }
+  & ul {
+    list-style: disc;
+  }
+  & ol {
+    list-style: decimal;
+  }
+  & li + li {
+    margin-top: 0.35em;
+  }
+  & a {
+    color: var(--color-navy);
+    font-weight: 700;
+    text-decoration: underline;
+  }
+  & strong {
+    color: var(--color-navy);
+  }
+}
+
 /* ---- Dog Doggi: motion ---- */
 
 /* Scroll-reveal: Layout.astro agrega .is-visible vía IntersectionObserver.

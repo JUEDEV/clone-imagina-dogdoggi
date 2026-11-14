@@ -1,11 +1,33 @@
-// TODO: reemplazar por el número real de Dog Doggi (la plantilla no lo trae).
-export const WHATSAPP_NUMBER = '573000000000'
+// Número de WhatsApp de la plantilla (versión con páginas internas).
+export const WHATSAPP_NUMBER = '573138355801'
+/** Número legible para mostrar en pantalla. */
+export const WHATSAPP_DISPLAY = '313 835 5801'
 
 export const waLink = (message?: string) =>
   `https://wa.me/${WHATSAPP_NUMBER}${message ? `?text=${encodeURIComponent(message)}` : ''}`
 
-export const WHATSAPP_URL = waLink('Hola Dog Doggi, necesito asesoría.')
+export const WHATSAPP_URL = waLink('Hola, quiero información sobre los productos de Dog Doggi')
 export const OFFERS_WHATSAPP_URL = waLink('Hola Dog Doggi, quiero conocer las ofertas.')
+
+// TODO: confirmar correo y horario reales (la plantilla los trae "por confirmar").
+export const CONTACT_EMAIL = '[correo por confirmar]'
+export const CONTACT_SCHEDULE = '[Horario por confirmar]'
+
+export interface Location {
+  city: string
+  /** Dirección corta, como se pinta en la tarjeta. */
+  address: string
+  /** Dirección completa para buscarla en Google Maps. */
+  mapsQuery: string
+}
+
+export const LOCATIONS: Location[] = [
+  { city: 'Pereira', address: 'Calle 37 #4B-05', mapsQuery: 'Calle 37 #4B-05, Pereira' },
+  { city: 'Ibagué', address: 'Cra. 4C #29-86, Hipódromo', mapsQuery: 'Cra. 4C #29-86, barrio Hipódromo, Ibagué' },
+]
+
+export const mapsUrl = (location: Location) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.mapsQuery)}`
 
 // TODO: confirmar las cuentas reales; la plantilla solo enlaza a las portadas de cada red.
 export const SOCIAL = [
@@ -25,48 +47,68 @@ export interface NavItem {
   highlight?: boolean
 }
 
-export interface MegaMenuGroup {
-  title: string
-  links: NavItem[]
+/** Categoría del menú Tienda; si tiene `children`, se despliegan al lado (escritorio) o en acordeón (móvil). */
+export interface ShopMenuItem {
+  label: string
+  href: string
+  children?: NavItem[]
 }
 
-// Mientras no existan las páginas de catálogo, los ítems apuntan a las secciones del home.
-export const NAV_BEFORE: NavItem[] = [{ label: 'Perfect Groom', href: '/#perfect-groom', highlight: true }]
+// TODO: al conectar Strata, confirmar que los slugs de categoría coincidan con los del CMS.
+export const NAV_BEFORE: NavItem[] = [{ label: 'Perfect Groom', href: '/productos?marca=Perfect+Groom', highlight: true }]
 
-export const SHOP_MENU: MegaMenuGroup[] = [
+// Menú Tienda según la referencia del cliente: lista vertical; las categorías
+// con subcategorías las despliegan al lado. Va fijo aquí (no sale del catálogo)
+// porque las páginas estáticas se generan sin acceso a Strata.
+// TODO: completar las subcategorías de las demás categorías cuando el cliente las envíe.
+const cat = (slug: string) => `/categorias/${slug}`
+export const SHOP_MENU: ShopMenuItem[] = [
+  { label: 'Cosmética', href: cat('cosmetica') },
+  { label: 'Complementos', href: cat('complementos') },
   {
-    title: 'Herramientas de corte',
-    links: [
-      { label: 'Cuchillas', href: '/#destacados' },
-      { label: 'Tijeras', href: '/#destacados' },
-      { label: 'Cepillería y peinado', href: '/#destacados' },
+    label: 'Tijeras',
+    href: cat('tijeras'),
+    children: [
+      { label: 'Tijeras curvas', href: cat('tijeras-curvas') },
+      { label: 'Tijeras microdentadas', href: cat('tijeras-microdentadas') },
+      { label: 'Tijeras de esculpir', href: cat('tijeras-de-esculpir') },
+      { label: 'Tijeras chunkers', href: cat('tijeras-chunkers') },
+      { label: 'Tijeras para zurdos', href: cat('tijeras-para-zurdos') },
+      { label: 'Tijeras DNA', href: cat('tijeras-dna') },
+      { label: 'Sets de tijeras', href: cat('sets-de-tijeras') },
+      { label: 'Complementos tijeras', href: cat('complementos-tijeras') },
     ],
   },
+  { label: 'Máquinas', href: cat('maquinas') },
+  { label: 'Cuchillas', href: cat('cuchillas') },
   {
-    title: 'Equipamiento',
-    links: [
-      { label: 'Secadores y sopladores', href: '/#destacados' },
-      { label: 'Mesas de corte', href: '/#destacados' },
-      { label: 'Repuestos y accesorios', href: '/#destacados' },
+    label: 'Equipamiento',
+    href: cat('equipamiento'),
+    children: [
+      { label: 'Secadores y sopladores', href: cat('secadores-y-sopladores') },
+      { label: 'Mesas de corte', href: cat('mesas-de-corte') },
+      { label: 'Repuestos y accesorios', href: cat('repuestos-y-accesorios') },
     ],
   },
+  { label: 'Vestuario profesional', href: cat('vestuario-profesional') },
+  { label: 'Formación', href: cat('formacion') },
 ]
 
 export const NAV_AFTER: NavItem[] = [
-  { label: 'Ofertas', href: '/#ofertas' },
+  { label: 'Ofertas', href: '/productos?destacado=ofertas' },
   { label: 'Blog', href: '/blog' },
-  { label: 'Nosotros', href: '/#nosotros' },
-  { label: 'Contacto', href: '#contacto' },
+  { label: 'Nosotros', href: '/nosotros' },
+  { label: 'Contacto', href: '/contacto' },
 ]
 
 export const FOOTER_COLUMNS: { title: string; links: NavItem[] }[] = [
   {
     title: 'Tienda',
     links: [
-      { label: 'Perfect Groom', href: '/#perfect-groom' },
-      { label: 'Herramientas', href: '/#destacados' },
-      { label: 'Equipamiento', href: '/#destacados' },
-      { label: 'Ofertas', href: '/#ofertas' },
+      { label: 'Perfect Groom', href: '/productos?marca=Perfect+Groom' },
+      { label: 'Tijeras', href: '/categorias/tijeras' },
+      { label: 'Equipamiento', href: '/categorias/equipamiento' },
+      { label: 'Ofertas', href: '/productos?destacado=ofertas' },
     ],
   },
   {
@@ -81,9 +123,9 @@ export const FOOTER_COLUMNS: { title: string; links: NavItem[] }[] = [
   {
     title: 'Empresa',
     links: [
-      { label: 'Nosotros', href: '/#nosotros' },
+      { label: 'Nosotros', href: '/nosotros' },
       { label: 'Blog', href: '/blog' },
-      { label: 'Contacto', href: '#contacto' },
+      { label: 'Contacto', href: '/contacto' },
       // TODO: página de políticas y privacidad.
       { label: 'Políticas y privacidad', href: waLink('Hola Dog Doggi, quiero conocer sus políticas de privacidad.'), external: true },
     ],

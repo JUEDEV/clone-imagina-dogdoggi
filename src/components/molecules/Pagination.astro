@@ -1,0 +1,53 @@
+---
+import Icon from '@/components/atoms/Icon.astro'
+import { listingUrl } from '@/lib/catalog/listing'
+
+// Paginación con enlaces (sin JS): ventana de hasta 7 números con puntos suspensivos.
+interface Props {
+  url: URL
+  page: number
+  pageCount: number
+}
+
+const { url, page, pageCount } = Astro.props
+
+function windowPages(): (number | '…')[] {
+  if (pageCount <= 7) return Array.from({ length: pageCount }, (_, i) => i + 1)
+  const pages = new Set([1, pageCount, page - 1, page, page + 1].filter((p) => p >= 1 && p <= pageCount))
+  const sorted = [...pages].sort((a, b) => a - b)
+  return sorted.flatMap((p, i) => (i > 0 && p - sorted[i - 1] > 1 ? (['…', p] as const) : ([p] as const)))
+}
+
+const href = (p: number) => listingUrl(url, { page: p })
+const linkClass = 'grid min-h-11 min-w-11 place-items-center rounded-[11px] border border-line px-3 text-sm font-extrabold transition-colors hover:border-navy'
+---
+
+{pageCount > 1 && (
+  <nav aria-label="Paginación" class="mt-10 flex flex-wrap items-center justify-center gap-2">
+    {page > 1 && (
+      <a href={href(page - 1)} rel="prev" class={linkClass}>
+        <span class="sr-only">Anterior</span>
+        <Icon name="chevron-left" class="size-5" />
+      </a>
+    )}
+    {windowPages().map((p) =>
+      p === '…' ? (
+        <span class="px-1 text-ink-soft" aria-hidden="true">…</span>
+      ) : (
+        <a
+          href={href(p)}
+          aria-current={p === page ? 'page' : undefined}
+          class:list={[linkClass, p === page && 'border-navy bg-navy text-white hover:border-navy']}
+        >
+          {p}
+        </a>
+      ),
+    )}
+    {page < pageCount && (
+      <a href={href(page + 1)} rel="next" class={linkClass}>
+        <span class="sr-only">Siguiente</span>
+        <Icon name="chevron-right" class="size-5" />
+      </a>
+    )}
+  </nav>
+)}

@@ -3,17 +3,26 @@ import Icon from '@/components/atoms/Icon.astro'
 import Reveal from '@/components/atoms/Reveal.astro'
 import ProductCard from '@/components/molecules/ProductCard.astro'
 import SectionHeading from '@/components/molecules/SectionHeading.astro'
-import { PRODUCTS, type ProductKind } from '@/data/products'
+import { cardContext, getCatalog, rootCategories } from '@/lib/catalog'
 
 // Filtro sin JS: radios + :has(). La fila es un scroll-snap nativo (no hace
 // falta Embla para deslizar); las flechas laterales son un <script> corto que
 // desplaza la fila una tarjeta y se desactivan en los extremos.
-const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
-  { id: 'filtro-todos', label: 'Más vendidos' },
-  { id: 'filtro-herramientas', label: 'Herramientas', kind: 'herramientas' },
-  { id: 'filtro-cosmetica', label: 'Cosmética', kind: 'cosmetica' },
-  { id: 'filtro-equipamiento', label: 'Equipamiento', kind: 'equipamiento' },
+// Las pestañas son las categorías raíz del catálogo; como cambian con el CMS,
+// la regla que oculta las demás tarjetas se genera aquí (Tailwind no ve clases dinámicas).
+const catalog = await getCatalog()
+const featured = catalog.products.filter((p) => p.featured)
+const products = (featured.length >= 4 ? featured : catalog.products).slice(0, 12)
+const FILTERS = [
+  { id: 'filtro-todos', label: 'Más vendidos', kind: '' },
+  // Solo las raíces con productos en la vitrina (no pestañas vacías).
+  ...rootCategories(catalog)
+    .filter((c) => products.some((p) => cardContext(catalog, p).kind === c.slug))
+    .map((c) => ({ id: `filtro-${c.slug}`, label: c.name, kind: c.slug })),
 ]
+const filterCss = FILTERS.filter((f) => f.kind)
+  .map((f) => `#destacados:has(#${f.id}:checked) [data-featured-track] [data-kind]:not([data-kind="${f.kind}"]){display:none}`)
+  .join('')
 ---
 
 <section id="destacados" class="bg-paper py-16 md:py-24">
@@ -41,9 +50,9 @@ const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
       <div class="relative">
         <div
           data-featured-track
-          class="scrollbar-none grid auto-cols-[calc((100%-12px)/2)] md:cursor-grab grid-flow-col gap-3 overflow-x-auto px-0.5 pt-1 pb-5 snap-x snap-mandatory md:auto-cols-[calc((100%-48px)/4)] md:gap-4 group-has-[#filtro-herramientas:checked]/filters:[&_[data-kind]:not([data-kind=herramientas])]:hidden group-has-[#filtro-cosmetica:checked]/filters:[&_[data-kind]:not([data-kind=cosmetica])]:hidden group-has-[#filtro-equipamiento:checked]/filters:[&_[data-kind]:not([data-kind=equipamiento])]:hidden"
+          class="scrollbar-none grid auto-cols-[calc((100%-12px)/2)] md:cursor-grab grid-flow-col gap-3 overflow-x-auto px-0.5 pt-1 pb-5 snap-x snap-mandatory md:auto-cols-[calc((100%-48px)/4)] md:gap-4"
         >
-          {PRODUCTS.map((product) => <ProductCard product={product} variant="compact" class="snap-start" />)}
+          {products.map((product) => <ProductCard product={product} {...cardContext(catalog, product)} variant="compact" class="snap-start" />)}
         </div>
         {([
           { dir: -1, icon: 'chevron-left', label: 'Productos anteriores', side: '-left-3 desk:-left-6' },
@@ -68,6 +77,8 @@ const FILTERS: { id: string; label: string; kind?: ProductKind }[] = [
     </Reveal>
   </div>
 </section>
+
+<style is:inline set:html={filterCss}></style>
 
 <script>
   // Flechas de la fila de destacados: avanzan una tarjeta y se desactivan en

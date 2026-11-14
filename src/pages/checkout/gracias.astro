@@ -1,0 +1,20 @@
+---
+import Layout from '@/layouts/Layout.astro'
+import OrderSummary from '@/components/organisms/checkout/OrderSummary.astro'
+import { isOrderReference } from '@/lib/orders/reference'
+import { getOrderRepository } from '@/lib/orders/repository'
+import { buildTitle } from '@/lib/seo'
+
+// Confirmación del pedido. Se lee del repositorio (Strata) con la referencia.
+export const prerender = false
+
+const reference = Astro.url.searchParams.get('ref') ?? ''
+const order = isOrderReference(reference) ? await getOrderRepository()?.findByReference(reference) : null
+if (!order) return Astro.redirect('/')
+---
+
+<Layout title={buildTitle('Gracias por tu compra')} noindex>
+  <main id="main-content" class="bg-[#f2f7f8] py-10 md:py-16">
+    <OrderSummary order={order} />
+  </main>
+</Layout>
